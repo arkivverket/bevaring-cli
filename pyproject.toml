@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "bevaring-cli"
+version = "0.1.0"
+description = "CLI tool to work with bevaring"
+authors = [
+  "Ole-Martin Bratteng <olebra@arkivverket.no>",
+]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+python-dotenv = "^0.20.0"
+flake8 = "^5.0.4"
+pylint = "^2.14.5"
+autopep8 = "^1.7.0"
+mypy = "^0.971"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
