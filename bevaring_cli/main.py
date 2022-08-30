@@ -17,7 +17,7 @@ app.add_typer(datasett.app, name="datasett")
 
 
 @app.callback()
-def main(endpoint: str = None):
+def main(endpoint: str = None) -> None:
     if endpoint:
         # Only inform the user if the endpoint is different from the default
         if state["endpoint"] != endpoint:
@@ -26,7 +26,7 @@ def main(endpoint: str = None):
 
 
 @app.command()
-def version():
+def version() -> None:
     """Prints the version"""
     print(f"bevaring-cli version {__version__}")
 
@@ -38,7 +38,7 @@ def login(
         "--use-device-code",
         help="Use device code flow, suitable for when running the CLI on a machine that does not have a browser installed.",
     )
-):
+) -> None:
     """
     Login to Azure AD
 

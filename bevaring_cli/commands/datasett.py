@@ -7,13 +7,13 @@ app = typer.Typer()
 
 
 @app.callback()
-def main(ctx: typer.Context):
+def main(ctx: typer.Context) -> None:
     if ctx.invoked_subcommand != 'login':
         state["credentials"] = Authentication().get_credentials()
 
 
 @app.command()
-def list():
+def list() -> None:
     import httpx
     from rich.console import Console
     from rich.table import Table

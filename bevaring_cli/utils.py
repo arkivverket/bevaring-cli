@@ -1,3 +1,4 @@
+from typing import Dict
 import logging
 
 from functools import cache
@@ -8,9 +9,9 @@ from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.exceptions import AuthenticationError
 
 # @TODO: replace this with production values
-state = {
+state: Dict[str, str | dict] = {
     "endpoint": "bevaring.dev.digitalarkivet.no",
-    "credentials": None,
+    "credentials": {},
 }
 
 
@@ -19,7 +20,7 @@ def get_config_directory() -> str:
     return get_app_dir(app_name=BEVARING_CLI_APP_NAME)
 
 
-def validate_result(result) -> dict | None:
+def validate_result(result) -> dict:
     if not result:
         print("[red]Could not login, an unknown error occured. Please try to re-authenticate:[/red]\nbevaring login")
         raise AuthenticationError()

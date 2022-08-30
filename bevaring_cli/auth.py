@@ -22,7 +22,7 @@ class Authentication:
     """
     _msal_app_instance = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.client_id = BEVARING_CLI_CLIENT_ID
         self.authority = "https://login.microsoftonline.com/99d3d298-60cf-4636-9772-4a191b6f0d94"
         self.scopes = [
@@ -30,7 +30,7 @@ class Authentication:
         ]
 
     @property
-    def _msal_app_kwargs(self):
+    def _msal_app_kwargs(self) -> dict:
         token_cache = PersistedTokenCache(
             FilePersistence(
                 f"{get_config_directory()}/msal_token_cache.json"
@@ -44,7 +44,7 @@ class Authentication:
         }
 
     @property
-    def _msal_app(self):
+    def _msal_app(self) -> msal.PublicClientApplication:
         """
         Returns the MSAL application object
         """
@@ -53,14 +53,14 @@ class Authentication:
 
         return self._msal_app_instance
 
-    def login_interactive(self):
+    def login_interactive(self) -> dict:
         """
         Acquires a token for the application
         """
         result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
         return validate_result(result)
 
-    def login_with_device_code(self):
+    def login_with_device_code(self) -> dict:
         """
         Acquires a token for the application
         """
@@ -75,7 +75,7 @@ class Authentication:
         result = self._msal_app.acquire_token_by_device_flow(flow)
         return validate_result(result)
 
-    def get_credentials(self):
+    def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
             print("[red]Not logged in, please login with:[/red]\nbevaring login")
