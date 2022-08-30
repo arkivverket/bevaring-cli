@@ -6,13 +6,12 @@ from typer import Typer, Option
 
 from bevaring_cli import __version__
 from bevaring_cli.auth.core import Authentication
+from bevaring_cli.utils import state
 
 logging.basicConfig(level=logging.INFO)  # Enable DEBUG log for entire script
-logging.getLogger("msal").setLevel(logging.INFO)  # Optionally disable MSAL DEBUG logs
+logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL DEBUG logs
 
 app = Typer()
-# @TODO: replace this with production values
-state = {"endpoint": "bevaring.dev.digitalarkivet.no"}
 
 
 @app.callback()
@@ -42,12 +41,11 @@ def login(
     which is suitable for when running the CLI on a machine that does not have a browser installed.
     """
     auth = Authentication()
-    scopes = [f"https://{state['endpoint']}/User.Login"]
 
     if use_device_code:
-        result = auth.login_with_device_code(scopes)
+        result = auth.login_with_device_code()
     else:
-        result = auth.login_interactive(scopes)
+        result = auth.login_interactive()
 
     if "access_token" in result:
         # Calling graph using the access token

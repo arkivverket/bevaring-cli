@@ -1,10 +1,9 @@
-from typing import List
-
 import logging
 import msal
 from rich import print
 
 from bevaring_cli import BEVARING_CLI_CLIENT_ID, __version__
+from bevaring_cli.utils import state
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +17,9 @@ class Authentication:
     def __init__(self):
         self.client_id = BEVARING_CLI_CLIENT_ID
         self.authority = "https://login.microsoftonline.com/99d3d298-60cf-4636-9772-4a191b6f0d94"
+        self.scopes = [
+            self._scope_builder("User.Login"),
+        ]
 
     @property
     def _msal_app(self):
@@ -34,17 +36,17 @@ class Authentication:
 
         return self._msal_app_instance
 
-    def login_interactive(self, scopes: List[str] = None):
+    def login_interactive(self):
         """
         Acquires a token for the application
         """
-        return self._msal_app.acquire_token_interactive(scopes=scopes)
+        return self._msal_app.acquire_token_interactive(scopes=self.scopes)
 
-    def login_with_device_code(self, scopes: List[str] = []):
+    def login_with_device_code(self):
         """
         Acquires a token for the application
         """
-        flow = self._msal_app.initiate_device_flow(scopes=scopes)
+        flow = self._msal_app.initiate_device_flow(scopes=self.scopes)
         if "user_code" not in flow:
             raise ValueError("Could not initiate device flow")
 
@@ -53,3 +55,6 @@ class Authentication:
         )
 
         return self._msal_app.acquire_token_by_device_flow(flow)
+
+    def _scope_builder(self, scope_name) -> str:
+        return f"https://{state['endpoint']}/{scope_name}"
