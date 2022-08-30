@@ -9,7 +9,7 @@ from bevaring_cli import (
     BEVARING_CLI_CLIENT_ID,
     __version__,
 )
-from bevaring_cli.auth.utils import validate_result
+from bevaring_cli.utils import validate_result
 from bevaring_cli.exceptions import AuthenticationError
 from bevaring_cli.utils import get_config_directory, state
 

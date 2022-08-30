@@ -1,10 +1,11 @@
 import logging
 
 from rich import print
-from typer import Typer, Option
+from typer import Option, Typer
 
 from bevaring_cli import __version__
-from bevaring_cli.auth.authentication import Authentication
+from bevaring_cli.auth import Authentication
+from bevaring_cli.commands import datasett
 from bevaring_cli.utils import state
 
 logging.basicConfig(level=logging.INFO)  # Enable DEBUG log for entire script
@@ -12,10 +13,11 @@ logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL D
 logger = logging.getLogger(__name__)
 
 app = Typer()
+app.add_typer(datasett.app, name="datasett")
 
 
 @app.callback()
-def main(endpoint: str | None = None):
+def main(endpoint: str = None):
     if endpoint:
         state["endpoint"] = endpoint
 
@@ -50,35 +52,6 @@ def login(
 
     if result:
         print(f"Successfully logged in as [green]{result['username']}[/green]")
-
-
-@app.command()
-def bevaring():
-    import httpx
-    from rich.console import Console
-    from rich.table import Table
-    console = Console()
-
-    auth = Authentication()
-    result = auth.get_credentials()
-
-    # Calling graph using the access token
-    response = httpx.get(
-        url=f"https://{state['endpoint']}/api/metadata/datasett?limit=2",
-        headers={
-            "Authorization": f"Bearer {result['access_token']}",
-        },
-    )
-
-    table = Table("Datasett ID", "Databehandler", "Merkelapp")
-    for dataset in response.json()["result"]:
-        table.add_row(
-            dataset["datasett_id"],
-            dataset["databehandler"],
-            dataset["merkelapp"],
-        )
-
-    console.print(table)
 
 
 if __name__ == "__main__":
