@@ -5,7 +5,7 @@ from rich import print
 from typer import Typer, Option
 
 from bevaring_cli import __version__
-from bevaring_cli.auth.core import Authentication
+from bevaring_cli.auth.authentication import Authentication
 from bevaring_cli.utils import state
 
 logging.basicConfig(level=logging.INFO)  # Enable DEBUG log for entire script
