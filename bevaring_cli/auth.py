@@ -7,6 +7,7 @@ from rich import print
 from bevaring_cli import (
     BEVARING_CLI_APP_NAME,
     BEVARING_CLI_CLIENT_ID,
+    BEVARING_CLI_TENANT_ID,
     __version__,
 )
 from bevaring_cli.utils import validate_result
@@ -24,7 +25,7 @@ class Authentication:
 
     def __init__(self) -> None:
         self.client_id = BEVARING_CLI_CLIENT_ID
-        self.authority = "https://login.microsoftonline.com/99d3d298-60cf-4636-9772-4a191b6f0d94"
+        self.authority = f"https://login.microsoftonline.com/{BEVARING_CLI_TENANT_ID}"
         self.scopes = [
             self._scope_builder("User.Login"),
         ]
@@ -87,5 +88,8 @@ class Authentication:
         result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
         return validate_result(result)
 
-    def _scope_builder(self, scope_name) -> str:
+    def _scope_builder(self, scope_name: str = None) -> str:
+        if not scope_name:
+            raise ValueError("Scope name is required")
+
         return f"https://{state['endpoint']}/{scope_name}"
