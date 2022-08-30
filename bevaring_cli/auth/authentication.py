@@ -10,6 +10,7 @@ from bevaring_cli import (
     __version__,
 )
 from bevaring_cli.auth.utils import validate_result
+from bevaring_cli.exceptions import AuthenticationError
 from bevaring_cli.utils import get_config_directory, state
 
 logger = logging.getLogger(__name__)
@@ -72,6 +73,18 @@ class Authentication:
         )
 
         result = self._msal_app.acquire_token_by_device_flow(flow)
+        return validate_result(result)
+
+    def get_credentials(self):
+        accounts = self._msal_app.get_accounts()
+        if not accounts:
+            print("[red]Not logged in, please login with:[/red]\nbevaring login")
+            raise AuthenticationError()
+
+        # We only support one account at the moment
+        account = accounts[0]
+
+        result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
         return validate_result(result)
 
     def _scope_builder(self, scope_name) -> str:

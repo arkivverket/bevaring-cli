@@ -1,5 +1,4 @@
 import logging
-import requests
 
 from rich import print
 from typer import Typer, Option
@@ -51,6 +50,22 @@ def login(
 
     if result:
         print(f"Successfully logged in as [green]{result['username']}[/green]")
+
+
+@app.command()
+def bevaring():
+    import httpx
+    auth = Authentication()
+    result = auth.get_credentials()
+
+    # Calling graph using the access token
+    response = httpx.get(
+        url=f"https://{state['endpoint']}/api/metadata/datasett?limit=2",
+        headers={
+            "Authorization": f"Bearer {result['access_token']}",
+        },
+    )
+    print(response.json())
 
 
 if __name__ == "__main__":

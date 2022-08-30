@@ -17,8 +17,9 @@ def validate_result(result) -> dict | None:
     if "id_token_claims" in result:
         id_token = result["id_token_claims"]
         return {
+            **result,
             "username": id_token["preferred_username"],
             "tenant_id": id_token["tid"],
         }
 
-    return None
+    return result
