@@ -1,9 +1,15 @@
 import logging
 import msal
+
+from msal_extensions import FilePersistence, PersistedTokenCache
 from rich import print
 
-from bevaring_cli import BEVARING_CLI_CLIENT_ID, __version__
-from bevaring_cli.utils import state
+from bevaring_cli import (
+    BEVARING_CLI_APP_NAME,
+    BEVARING_CLI_CLIENT_ID,
+    __version__,
+)
+from bevaring_cli.utils import get_config_directory, state
 
 logger = logging.getLogger(__name__)
 
@@ -22,17 +28,26 @@ class Authentication:
         ]
 
     @property
+    def _msal_app_kwargs(self):
+        token_cache = PersistedTokenCache(
+            FilePersistence(
+                f"{get_config_directory()}/msal_token_cache.json"
+            )
+        )
+        return {
+            "token_cache": token_cache,
+            "authority": self.authority,
+            "app_name": BEVARING_CLI_APP_NAME,
+            "app_version": __version__,
+        }
+
+    @property
     def _msal_app(self):
         """
         Returns the MSAL application object
         """
         if not self._msal_app_instance:
-            self._msal_app_instance = msal.PublicClientApplication(
-                client_id=self.client_id,
-                authority=self.authority,
-                app_version=__version__,
-                app_name="Bevaring CLI",
-            )
+            self._msal_app_instance = msal.PublicClientApplication(client_id=self.client_id, **self._msal_app_kwargs)
 
         return self._msal_app_instance
 
