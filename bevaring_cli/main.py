@@ -19,6 +19,9 @@ app.add_typer(datasett.app, name="datasett")
 @app.callback()
 def main(endpoint: str = None):
     if endpoint:
+        # Only inform the user if the endpoint is different from the default
+        if state["endpoint"] != endpoint:
+            print(f"Setting endpoint to [green]{endpoint}[/green]")
         state["endpoint"] = endpoint
 
 
