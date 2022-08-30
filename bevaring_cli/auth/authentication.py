@@ -9,6 +9,7 @@ from bevaring_cli import (
     BEVARING_CLI_CLIENT_ID,
     __version__,
 )
+from bevaring_cli.auth.utils import validate_result
 from bevaring_cli.utils import get_config_directory, state
 
 logger = logging.getLogger(__name__)
@@ -55,7 +56,8 @@ class Authentication:
         """
         Acquires a token for the application
         """
-        return self._msal_app.acquire_token_interactive(scopes=self.scopes)
+        result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
+        return validate_result(result)
 
     def login_with_device_code(self):
         """
@@ -69,7 +71,8 @@ class Authentication:
             f"To sign in, use a web browser to open the page {flow['verification_uri']} and enter the code [bold green]{flow['user_code']}[/bold green] to authenticate."
         )
 
-        return self._msal_app.acquire_token_by_device_flow(flow)
+        result = self._msal_app.acquire_token_by_device_flow(flow)
+        return validate_result(result)
 
     def _scope_builder(self, scope_name) -> str:
         return f"https://{state['endpoint']}/{scope_name}"

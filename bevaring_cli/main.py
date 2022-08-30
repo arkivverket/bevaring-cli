@@ -10,6 +10,7 @@ from bevaring_cli.utils import state
 
 logging.basicConfig(level=logging.INFO)  # Enable DEBUG log for entire script
 logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL DEBUG logs
+logger = logging.getLogger(__name__)
 
 app = Typer()
 
@@ -41,27 +42,15 @@ def login(
     which is suitable for when running the CLI on a machine that does not have a browser installed.
     """
     auth = Authentication()
+    result = None
 
     if use_device_code:
         result = auth.login_with_device_code()
     else:
         result = auth.login_interactive()
 
-    if "access_token" in result:
-        # Calling graph using the access token
-        response = requests.get(
-            url=f"https://{state['endpoint']}/api/metadata/datasett?limit=1",
-            allow_redirects=False,
-            headers={
-                "Authorization": f"Bearer {result['access_token']}",
-            },
-        )
-        print(f"Response HTTP Status Code: {response.status_code}")
-        print(response.content.decode('utf-8'))
-    else:
-        logging.error(result.get("error"))
-        logging.error(result.get("error_description"))
-        logging.error(result.get("correlation_id"))  # You may need this when reporting a bug
+    if result:
+        print(f"Successfully logged in as [green]{result['username']}[/green]")
 
 
 if __name__ == "__main__":
