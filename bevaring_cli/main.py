@@ -55,6 +55,10 @@ def login(
 @app.command()
 def bevaring():
     import httpx
+    from rich.console import Console
+    from rich.table import Table
+    console = Console()
+
     auth = Authentication()
     result = auth.get_credentials()
 
@@ -65,7 +69,16 @@ def bevaring():
             "Authorization": f"Bearer {result['access_token']}",
         },
     )
-    print(response.json())
+
+    table = Table("Datasett ID", "Databehandler", "Merkelapp")
+    for dataset in response.json()["result"]:
+        table.add_row(
+            dataset["datasett_id"],
+            dataset["databehandler"],
+            dataset["merkelapp"],
+        )
+
+    console.print(table)
 
 
 if __name__ == "__main__":
