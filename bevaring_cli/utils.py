@@ -2,6 +2,7 @@ import logging
 
 from functools import cache
 from typer import get_app_dir
+from rich import print
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.exceptions import AuthenticationError
