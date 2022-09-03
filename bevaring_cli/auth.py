@@ -7,7 +7,6 @@ from rich import print
 from bevaring_cli import (
     BEVARING_CLI_APP_NAME,
     BEVARING_CLI_CLIENT_ID,
-    BEVARING_CLI_TENANT_ID,
     __version__,
 )
 from bevaring_cli.utils import validate_result
@@ -25,7 +24,7 @@ class Authentication:
 
     def __init__(self) -> None:
         self.client_id = BEVARING_CLI_CLIENT_ID
-        self.authority = f"https://login.microsoftonline.com/{BEVARING_CLI_TENANT_ID}"
+        self.authority = "https://login.microsoftonline.com/organizations"
         self.scopes = [
             self._scope_builder("User.Login"),
         ]

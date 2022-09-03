@@ -9,10 +9,10 @@ def test_auth():
 
     assert auth._msal_app_instance is None
     assert auth.client_id == "d18685f9-148d-4e9a-98b3-194bcd01bc95"
-    assert auth.authority == "https://login.microsoftonline.com/99d3d298-60cf-4636-9772-4a191b6f0d94"
+    assert auth.authority == "https://login.microsoftonline.com/organizations"
     assert auth.scopes == ["https://bevaring.dev.digitalarkivet.no/User.Login"]
 
-    assert auth._msal_app_kwargs["authority"] == "https://login.microsoftonline.com/99d3d298-60cf-4636-9772-4a191b6f0d94"
+    assert auth._msal_app_kwargs["authority"] == "https://login.microsoftonline.com/organizations"
     assert auth._msal_app_kwargs["app_name"] == "bevaring-cli"
     assert auth._msal_app_kwargs["app_version"] == "0.1.0"
 
