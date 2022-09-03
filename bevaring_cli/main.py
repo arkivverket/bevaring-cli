@@ -40,7 +40,7 @@ def login(
     )
 ) -> None:
     """
-    Login to Azure AD
+    Login with Azure AD
 
     By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
     which is suitable for when running the CLI on a machine that does not have a browser installed.
