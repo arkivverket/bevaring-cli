@@ -24,3 +24,24 @@ pipx install https://github.com/arkivverket/bevaring-cli/bevaring_cli-0.2.0-py3-
 ## Usage
 
 See [`USAGE.md`](USAGE.md)
+
+## Usage (development)
+
+Enter the poetry environment (`poetry shell`), are pre-prend all commands with `poetry run`.
+
+```shell
+python -m bevaring_cli.main [OPTIONS] COMMAND [ARGS]...
+```
+
+**Example**:
+
+```shell
+python -m bevaring_cli.main login
+python -m bevaring_cli.main --endpoint bevaring.test.digitalarkivet.no login
+```
+
+### Building wheel
+
+```shell
+poetry build --format wheel
+```
