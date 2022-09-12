@@ -506,6 +506,26 @@ dev = ["pre-commit (>=2.17.0,<3.0.0)", "flake8 (>=3.8.3,<4.0.0)", "autoflake (>=
 all = ["rich (>=10.11.0,<13.0.0)", "shellingham (>=1.3.0,<2.0.0)", "colorama (>=0.4.3,<0.5.0)"]
 
 [[package]]
+name = "typer-cli"
+version = "0"
+description = "Run Typer scripts with completion, without having to create a package, using Typer CLI."
+category = "dev"
+optional = false
+python-versions = "^3.6.2"
+develop = false
+
+[package.dependencies]
+colorama = "^0.4.3"
+shellingham = "^1.3.2"
+typer = ">=0.4.0,<=0.6.1"
+
+[package.source]
+type = "git"
+url = "https://github.com/cdcadman/typer-cli"
+reference = "78df55c"
+resolved_reference = "78df55c2f25c927780308169247f9ea823a7726c"
+
+[[package]]
 name = "typing-extensions"
 version = "4.3.0"
 description = "Backported and Experimental Type Hints for Python 3.7+"
@@ -529,7 +549,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "5b04869b55fd3f501a45ecd98cf59340d85535fa1b251d48a251fa17c9610f8c"
+content-hash = "30ec3caabec4a5b47b8f5eacbf1ee3f6f87ccf78696c407e8817158f41a5bda2"
 
 [metadata.files]
 anyio = [
@@ -819,6 +839,7 @@ typer = [
     {file = "typer-0.6.1-py3-none-any.whl", hash = "sha256:54b19e5df18654070a82f8c2aa1da456a4ac16a2a83e6dcd9f170e291c56338e"},
     {file = "typer-0.6.1.tar.gz", hash = "sha256:2d5720a5e63f73eaf31edaa15f6ab87f35f0690f8ca233017d7d23d743a91d73"},
 ]
+typer-cli = []
 typing-extensions = [
     {file = "typing_extensions-4.3.0-py3-none-any.whl", hash = "sha256:25642c956049920a5aa49edcdd6ab1e06d7e5d467fc00e0506c44ac86fbfca02"},
     {file = "typing_extensions-4.3.0.tar.gz", hash = "sha256:e6d2677a32f47fc7eb2795db1dd15c1f34eff616bcaf2cfb5e997f854fa1c4a6"},
