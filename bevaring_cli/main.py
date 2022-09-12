@@ -17,7 +17,12 @@ app.add_typer(datasett.app, name="datasett")
 
 
 @app.callback()
-def main(endpoint: str = None) -> None:
+def main(
+    endpoint: str = Option(
+        state["endpoint"],
+        help="The endpoint to use for the API",
+    ),
+) -> None:
     if endpoint:
         # Only inform the user if the endpoint is different from the default
         if state["endpoint"] != endpoint:
