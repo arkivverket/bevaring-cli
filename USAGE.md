@@ -15,9 +15,77 @@ bevaring [OPTIONS] COMMAND [ARGS]...
 
 **Commands**:
 
+* `auth`
 * `datasett`
-* `login`: Login with Azure AD
 * `version`: Prints the version
+
+## `bevaring auth`
+
+**Usage**:
+
+```console
+bevaring auth [OPTIONS] COMMAND [ARGS]...
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
+
+**Commands**:
+
+* `debug-jwt`: Debug the JWT token
+* `login`: Login with Azure AD
+* `logout`: Login with Azure AD
+
+### `bevaring auth debug-jwt`
+
+Debug the JWT token
+
+**Usage**:
+
+```console
+bevaring auth debug-jwt [OPTIONS]
+```
+
+**Options**:
+
+* `-y, --yes`: Do not prompt for confirmation
+* `--help`: Show this message and exit.
+
+### `bevaring auth login`
+
+Login with Azure AD
+
+By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
+which is suitable for when running the CLI on a machine that does not have a browser installed.
+
+**Usage**:
+
+```console
+bevaring auth login [OPTIONS]
+```
+
+**Options**:
+
+* `--use-device-code`: Use device code flow, suitable for when running the CLI on a machine that does not have a browser installed.
+* `--help`: Show this message and exit.
+
+### `bevaring auth logout`
+
+Login with Azure AD
+
+By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
+which is suitable for when running the CLI on a machine that does not have a browser installed.
+
+**Usage**:
+
+```console
+bevaring auth logout [OPTIONS]
+```
+
+**Options**:
+
+* `--help`: Show this message and exit.
 
 ## `bevaring datasett`
 
@@ -45,24 +113,6 @@ bevaring datasett list [OPTIONS]
 
 **Options**:
 
-* `--help`: Show this message and exit.
-
-## `bevaring login`
-
-Login with Azure AD
-
-By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
-which is suitable for when running the CLI on a machine that does not have a browser installed.
-
-**Usage**:
-
-```console
-bevaring login [OPTIONS]
-```
-
-**Options**:
-
-* `--use-device-code`: Use device code flow, suitable for when running the CLI on a machine that does not have a browser installed.
 * `--help`: Show this message and exit.
 
 ## `bevaring version`
