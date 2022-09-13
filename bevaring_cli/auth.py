@@ -8,9 +8,8 @@ from bevaring_cli import (
     BEVARING_CLI_CLIENT_ID,
     __version__,
 )
-from bevaring_cli.utils import validate_result
 from bevaring_cli.exceptions import AuthenticationError
-from bevaring_cli.utils import console, get_config_directory, state
+from bevaring_cli.utils import console, get_config_directory, state, validate_result
 
 logger = logging.getLogger(__name__)
 
