@@ -51,3 +51,22 @@ def logout() -> None:
     auth = Authentication()
     print("Logging out...")
     auth.logout()
+
+
+@app.command()
+def debug_jwt(
+    yes: bool = typer.Option(
+        False,
+        "--yes",
+        "-y",
+        help="Do not prompt for confirmation",
+    ),
+) -> None:
+    """
+    Debug the JWT token
+    """
+    auth = Authentication()
+    if not yes:
+        typer.confirm("This will print the JWT token to the console. Do you want to continue?", abort=True)
+
+    print(auth.get_credentials()["access_token"])
