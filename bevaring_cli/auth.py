@@ -78,6 +78,12 @@ class Authentication:
         result = self._msal_app.acquire_token_by_device_flow(flow)
         return validate_result(result)
 
+    def logout(self) -> None:
+        users = self._msal_app.get_accounts()
+
+        for user in users:
+            self._msal_app.remove_account(user)
+
     def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
