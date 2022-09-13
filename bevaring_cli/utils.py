@@ -22,12 +22,12 @@ def get_config_directory() -> str:
 
 def validate_result(result) -> dict:
     if not result:
-        print("[red]Could not login, an unknown error occured. Please try to re-authenticate:[/red]\nbevaring login")
+        print("[red]Could not login, an unknown error occured. Please try to re-authenticate:[/red]\nbevaring auth login")
         raise AuthenticationError()
 
     if "error" in result:
         logging.debug(result)
-        print("[red]Could not authenticate, please re-authenticate with:[/red]\nbevaring login")
+        print("[red]Could not authenticate, please re-authenticate with:[/red]\nbevaring auth login")
         raise AuthenticationError()
 
     if "id_token_claims" in result:

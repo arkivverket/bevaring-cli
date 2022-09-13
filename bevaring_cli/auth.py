@@ -58,7 +58,7 @@ class Authentication:
         Acquires a token for the application
         """
         print("A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
-        print("Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `bevaring login --use-device-code`.")
+        print("Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `bevaring auth login --use-device-code`.")
 
         result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
         return validate_result(result)
@@ -81,7 +81,7 @@ class Authentication:
     def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
-            print("[red]Not logged in, please login with:[/red]\nbevaring login")
+            print("[red]Not logged in, please login with:[/red]\nbevaring auth login")
             raise AuthenticationError()
 
         # We only support one account at the moment
