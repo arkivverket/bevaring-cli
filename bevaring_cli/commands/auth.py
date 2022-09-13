@@ -67,4 +67,4 @@ def debug_jwt(
     if not yes:
         typer.confirm("This will print the JWT token to the console. Do you want to continue?", abort=True)
 
-    console.print(auth.get_credentials()["access_token"])
+    print(auth.get_credentials()["access_token"])
