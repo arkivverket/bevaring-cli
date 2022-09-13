@@ -1,9 +1,8 @@
 from typing import Dict
-import logging
 
 from functools import cache
 from typer import get_app_dir
-from rich import print
+from rich.console import Console
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.exceptions import AuthenticationError
@@ -14,6 +13,8 @@ state: Dict[str, str | dict] = {
     "credentials": {},
 }
 
+console = Console()
+
 
 @cache
 def get_config_directory() -> str:
@@ -22,12 +23,12 @@ def get_config_directory() -> str:
 
 def validate_result(result) -> dict:
     if not result:
-        print("[red]Could not login, an unknown error occured. Please try to re-authenticate:[/red]\nbevaring auth login")
+        console.print("[red]Could not login, an unknown error occured. Please try to re-authenticate:[/red]\nbevaring auth login")
         raise AuthenticationError()
 
     if "error" in result:
-        logging.debug(result)
-        print("[red]Could not authenticate, please re-authenticate with:[/red]\nbevaring auth login")
+        console.print(result)
+        console.print("[red]Could not authenticate, please re-authenticate with:[/red]\nbevaring auth login")
         raise AuthenticationError()
 
     if "id_token_claims" in result:

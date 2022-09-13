@@ -1,9 +1,7 @@
 import typer
 
-from rich import print
-
 from bevaring_cli.auth import Authentication
-from bevaring_cli.utils import state
+from bevaring_cli.utils import console, state
 
 app = typer.Typer()
 
@@ -37,7 +35,7 @@ def login(
         result = auth.login_interactive()
 
     if result:
-        print(f"Successfully logged in as [green]{result['username']}[/green]")
+        console.print(f"Successfully logged in as [green]{result['username']}[/green]")
 
 
 @app.command()
@@ -49,7 +47,7 @@ def logout() -> None:
     which is suitable for when running the CLI on a machine that does not have a browser installed.
     """
     auth = Authentication()
-    print("Logging out...")
+    console.print("Logging out...")
     auth.logout()
 
 
@@ -69,4 +67,4 @@ def debug_jwt(
     if not yes:
         typer.confirm("This will print the JWT token to the console. Do you want to continue?", abort=True)
 
-    print(auth.get_credentials()["access_token"])
+    console.print(auth.get_credentials()["access_token"])

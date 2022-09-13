@@ -2,7 +2,6 @@ import logging
 import msal
 
 from msal_extensions import FilePersistence, PersistedTokenCache
-from rich import print
 
 from bevaring_cli import (
     BEVARING_CLI_APP_NAME,
@@ -11,7 +10,7 @@ from bevaring_cli import (
 )
 from bevaring_cli.utils import validate_result
 from bevaring_cli.exceptions import AuthenticationError
-from bevaring_cli.utils import get_config_directory, state
+from bevaring_cli.utils import console, get_config_directory, state
 
 logger = logging.getLogger(__name__)
 
@@ -57,8 +56,8 @@ class Authentication:
         """
         Acquires a token for the application
         """
-        print("A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
-        print("Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `bevaring auth login --use-device-code`.")
+        console.print("A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
+        console.print("Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `bevaring auth login --use-device-code`.")
 
         result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
         return validate_result(result)
@@ -71,7 +70,7 @@ class Authentication:
         if "user_code" not in flow:
             raise ValueError("Could not initiate device flow")
 
-        print(
+        console.print(
             f"To sign in, use a web browser to open the page {flow['verification_uri']} and enter the code [bold green]{flow['user_code']}[/bold green] to authenticate."
         )
 
@@ -87,7 +86,7 @@ class Authentication:
     def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
-            print("[red]Not logged in, please login with:[/red]\nbevaring auth login")
+            console.print("[red]Not logged in, please login with:[/red]\nbevaring auth login")
             raise AuthenticationError()
 
         # We only support one account at the moment

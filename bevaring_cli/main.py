@@ -1,11 +1,10 @@
 import logging
 
-from rich import print
 from typer import Option, Typer
 
 from bevaring_cli import __version__
 from bevaring_cli.commands import auth, datasett
-from bevaring_cli.utils import state
+from bevaring_cli.utils import console, state
 
 logging.basicConfig(level=logging.INFO)  # Enable DEBUG log for entire script
 logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL DEBUG logs
@@ -26,14 +25,14 @@ def main(
     if endpoint:
         # Only inform the user if the endpoint is different from the default
         if state["endpoint"] != endpoint:
-            print(f"Setting endpoint to [green]{endpoint}[/green]")
+            console.print(f"Setting endpoint to [green]{endpoint}[/green]")
         state["endpoint"] = endpoint
 
 
 @app.command()
 def version() -> None:
     """Prints the version"""
-    print(f"bevaring-cli version {__version__}")
+    console.print(f"bevaring-cli version {__version__}")
 
 
 if __name__ == "__main__":
