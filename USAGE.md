@@ -35,7 +35,7 @@ bevaring auth [OPTIONS] COMMAND [ARGS]...
 
 * `debug-jwt`: Debug the JWT token
 * `login`: Login with Azure AD
-* `logout`: Login with Azure AD
+* `logout`: Logout from Azure AD
 
 ### `bevaring auth debug-jwt`
 
@@ -72,10 +72,7 @@ bevaring auth login [OPTIONS]
 
 ### `bevaring auth logout`
 
-Login with Azure AD
-
-By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
-which is suitable for when running the CLI on a machine that does not have a browser installed.
+Logout from Azure AD
 
 **Usage**:
 
