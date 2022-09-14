@@ -1,6 +1,7 @@
 import logging
 
 from typer import Option, Typer
+from sys import stdout
 
 from bevaring_cli import __version__
 from bevaring_cli.commands import auth, datasett
@@ -23,8 +24,11 @@ def main(
     ),
 ) -> None:
     if endpoint:
-        # Only inform the user if the endpoint is different from the default
-        if state["endpoint"] != endpoint:
+        """
+        Only inform the user if the endpoint is different from the default
+        stdout.isatty() is used to check if the output is a terminal or not, to avoid printing the message when piping the output to another command
+        """
+        if state["endpoint"] != endpoint and stdout.isatty():
             console.print(f"Setting endpoint to [green]{endpoint}[/green]")
         state["endpoint"] = endpoint
 
