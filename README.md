@@ -15,10 +15,8 @@ CLI tool to work with bevaring.
 
 Before installing `bevaring-cli`, make sure you have the [prerequisites](#project-prerequisites) installed.
 
-@TODO: update with correct URL
-
 ```shell
-pipx install https://github.com/arkivverket/bevaring-cli/bevaring_cli-0.2.0-py3-none-any.whl
+pipx install https://github.com/arkivverket/bevaring-cli/releases/download/0.1.0/bevaring_cli-0.1.0-py3-none-any.whl
 ```
 
 ## Usage
