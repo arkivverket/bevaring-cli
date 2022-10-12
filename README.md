@@ -25,6 +25,11 @@ See [`USAGE.md`](USAGE.md)
 
 ## Usage (development)
 
+Install dependencies first:
+```shell
+poetry install
+```
+
 Enter the poetry environment (`poetry shell`), are pre-prend all commands with `poetry run`.
 
 ```shell
