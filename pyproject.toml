@@ -16,6 +16,7 @@ typer = {extras = ["all"], version = "^0.6.1"}
 msal = "^1.18.0"
 msal-extensions = "^1.0.0"
 httpx = "^0.23.0"
+enterprython = "^0.7.0"
 
 [tool.poetry.dev-dependencies]
 python-dotenv = "^0.21.0"

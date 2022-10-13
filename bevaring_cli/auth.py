@@ -1,5 +1,6 @@
 import logging
 import msal
+from enterprython import component
 
 from msal_extensions import FilePersistence, PersistedTokenCache
 
@@ -14,6 +15,7 @@ from bevaring_cli.utils import console, get_config_directory, state, validate_re
 logger = logging.getLogger(__name__)
 
 
+@component()
 class Authentication:
     """
     We use the prefix _msal to identify variables and methods used for the MSAL library

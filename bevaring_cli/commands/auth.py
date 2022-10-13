@@ -1,67 +1,71 @@
+from __main__ import App
+
 import typer
+from enterprython import component
 
+from bevaring_cli.Cmd import Cmd
 from bevaring_cli.auth import Authentication
-from bevaring_cli.utils import console, state
-
-app = typer.Typer()
+from bevaring_cli.utils import console
 
 
-@app.callback()
-def main(ctx: typer.Context) -> None:
-    if ctx.invoked_subcommand != 'login':
-        state["credentials"] = Authentication().get_credentials()
+@component()
+class AuthCmd(Cmd):
 
+    def __init__(self, app: App, auth: Authentication):
+        super().__init__()
+        self._auth = auth
+        self.register(self.login, self.logout)
+        app.add(self._app, "auth")
 
-@app.command()
-def login(
-    use_device_code: bool = typer.Option(
-        False,
-        "--use-device-code",
-        help="Use device code flow, suitable for when running the CLI on a machine that does not have a browser installed.",
-    ),
-) -> None:
-    """
-    Login with Azure AD
+# @app.callback()
+# def main(ctx: typer.Context) -> None:
+#     if ctx.invoked_subcommand != 'login':
+#         state["credentials"] = Authentication().get_credentials()
 
-    By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
-    which is suitable for when running the CLI on a machine that does not have a browser installed.
-    """
-    auth = Authentication()
-    result = None
+    def login(
+        self,
+        use_device_code: bool = typer.Option(
+            False,
+            "--use-device-code",
+            help="Use device code flow, suitable for when running the CLI on a machine that does not have a browser installed.",
+        ),
+    ) -> None:
+        """
+        Login with Azure AD
 
-    if use_device_code:
-        result = auth.login_with_device_code()
-    else:
-        result = auth.login_interactive()
+        By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
+        which is suitable for when running the CLI on a machine that does not have a browser installed.
+        """
+        result = None
 
-    if result:
-        console.print(f"Successfully logged in as [green]{result['username']}[/green]")
+        if use_device_code:
+            result = self._auth.login_with_device_code()
+        else:
+            result = self._auth.login_interactive()
 
+        if result:
+            console.print(f"Successfully logged in as [green]{result['username']}[/green]")
 
-@app.command()
-def logout() -> None:
-    """
-    Logout from Azure AD
-    """
-    auth = Authentication()
-    console.print("Logging out...")
-    auth.logout()
+    def logout(self) -> None:
+        """
+        Logout from Azure AD
+        """
+        console.print("Logging out...")
+        self._auth.logout()
 
+    def debug_jwt(
+        self,
+        yes: bool = typer.Option(
+            False,
+            "--yes",
+            "-y",
+            help="Do not prompt for confirmation",
+        ),
+    ) -> None:
+        """
+        Debug the JWT token
+        """
+        if not yes:
+            typer.confirm("This will print the JWT token to the console. Do you want to continue?", abort=True)
 
-@app.command()
-def debug_jwt(
-    yes: bool = typer.Option(
-        False,
-        "--yes",
-        "-y",
-        help="Do not prompt for confirmation",
-    ),
-) -> None:
-    """
-    Debug the JWT token
-    """
-    auth = Authentication()
-    if not yes:
-        typer.confirm("This will print the JWT token to the console. Do you want to continue?", abort=True)
-
-    print(auth.get_credentials()["access_token"])
+        print(self._auth.get_credentials()["access_token"])
