@@ -1,11 +1,13 @@
+import logging
 from __main__ import App
 
 import typer
 from enterprython import component
 
-from bevaring_cli.Cmd import Cmd
+from bevaring_cli.cmd import Cmd
 from bevaring_cli.auth import Authentication
-from bevaring_cli.utils import console
+
+log = logging.getLogger(__name__)
 
 
 @component()
@@ -17,24 +19,20 @@ class AuthCmd(Cmd):
         self.register(self.login, self.logout)
         app.add(self._app, "auth")
 
-# @app.callback()
-# def main(ctx: typer.Context) -> None:
-#     if ctx.invoked_subcommand != 'login':
-#         state["credentials"] = Authentication().get_credentials()
-
     def login(
         self,
         use_device_code: bool = typer.Option(
             False,
             "--use-device-code",
-            help="Use device code flow, suitable for when running the CLI on a machine that does not have a browser installed.",
+            help="Use device code flow, suitable for when running the CLI on a machine "
+                 "that does not have a browser installed.",
         ),
     ) -> None:
         """
         Login with Azure AD
 
-        By default this will use interactive authentication, but you can use the --device-code flag to use device code authentication,
-        which is suitable for when running the CLI on a machine that does not have a browser installed.
+        By default, this will use interactive authentication, but you can use the --device-code flag to use device code
+        authentication, which is suitable for when running the CLI on a machine that does not have a browser installed.
         """
         result = None
 
@@ -44,13 +42,13 @@ class AuthCmd(Cmd):
             result = self._auth.login_interactive()
 
         if result:
-            console.print(f"Successfully logged in as [green]{result['username']}[/green]")
+            log.info(f"Successfully logged in as [green]{result['username']}[/green]")
 
     def logout(self) -> None:
         """
         Logout from Azure AD
         """
-        console.print("Logging out...")
+        log.info("Logging out...")
         self._auth.logout()
 
     def debug_jwt(

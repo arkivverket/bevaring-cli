@@ -1,34 +1,28 @@
+import logging
 from __main__ import App
 
 from enterprython import component
+from httpx import Client
 
-from bevaring_cli.Cmd import Cmd
-from bevaring_cli.auth import Authentication
-from bevaring_cli.utils import state
+from bevaring_cli.cmd import Cmd
+
+log = logging.getLogger(__name__)
 
 
 @component()
-class Datasett(Cmd):
+class DatasettCmd(Cmd):
 
-    def __init__(self, app: App, auth: Authentication):
+    def __init__(self, app: App, bevaring: Client):
         super().__init__()
-        self._auth = auth
+        self._bevaring = bevaring
         self.register(self.list)
         app.add(self._app, "datasett")
 
     def list(self) -> None:
-        import httpx
-        from rich.console import Console
         from rich.table import Table
-        console = Console()
 
         # Calling graph using the access token
-        response = httpx.get(
-            url=f"https://{state['endpoint']}/api/metadata/datasett?limit=2",
-            headers={
-                "Authorization": f"Bearer {self._auth.get_credentials()['access_token']}",
-            },
-        )
+        response = self._bevaring.get('datasett?limit=2')
 
         table = Table("Datasett ID", "Databehandler", "Merkelapp")
         for dataset in response.json()["result"]:
@@ -38,4 +32,4 @@ class Datasett(Cmd):
                 dataset["merkelapp"],
             )
 
-        console.print(table)
+        log.info(table)

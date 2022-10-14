@@ -1,18 +1,19 @@
 import logging
+
 import msal
 from enterprython import component
-
 from msal_extensions import FilePersistence, PersistedTokenCache
 
 from bevaring_cli import (
     BEVARING_CLI_APP_NAME,
-    BEVARING_CLI_CLIENT_ID,
     __version__,
 )
+from bevaring_cli.config import Config
 from bevaring_cli.exceptions import AuthenticationError
-from bevaring_cli.utils import console, get_config_directory, state, validate_result
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
+
+REAUTHENTICATE = " Please try to re-authenticate with: " + BEVARING_CLI_APP_NAME + " auth login"
 
 
 @component()
@@ -22,20 +23,14 @@ class Authentication:
     """
     _msal_app_instance = None
 
-    def __init__(self) -> None:
-        self.client_id = BEVARING_CLI_CLIENT_ID
+    def __init__(self, cfg: Config) -> None:
+        self.cfg = cfg
         self.authority = "https://login.microsoftonline.com/organizations"
-        self.scopes = [
-            self._scope_builder("User.Login"),
-        ]
+        self.scopes = [self._scope_builder("User.Login")]
 
     @property
     def _msal_app_kwargs(self) -> dict:
-        token_cache = PersistedTokenCache(
-            FilePersistence(
-                f"{get_config_directory()}/msal_token_cache.json"
-            )
-        )
+        token_cache = PersistedTokenCache(FilePersistence(f"{self.cfg.config_dir}/msal_token_cache.json"))
         return {
             "token_cache": token_cache,
             "authority": self.authority,
@@ -49,7 +44,8 @@ class Authentication:
         Returns the MSAL application object
         """
         if not self._msal_app_instance:
-            self._msal_app_instance = msal.PublicClientApplication(client_id=self.client_id, **self._msal_app_kwargs)
+            self._msal_app_instance = msal.PublicClientApplication(client_id=self.cfg.client_id,
+                                                                   **self._msal_app_kwargs)
 
         return self._msal_app_instance
 
@@ -57,11 +53,14 @@ class Authentication:
         """
         Acquires a token for the application
         """
-        console.print("A web browser has been opened at https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
-        console.print("Please continue the login in the web browser. If no web browser is available or if the web browser fails to open, use device code flow with `bevaring auth login --use-device-code`.")
+        log.info("A web browser has been opened at "
+                 "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
+        log.info("Please continue the login in the web browser. "
+                 "If no web browser is available or if the web browser fails to open, "
+                 "use device code flow with `bevaring auth login --use-device-code`.")
 
         result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
-        return validate_result(result)
+        return Authentication.validate_result(result)
 
     def login_with_device_code(self) -> dict:
         """
@@ -71,12 +70,13 @@ class Authentication:
         if "user_code" not in flow:
             raise ValueError("Could not initiate device flow")
 
-        console.print(
-            f"To sign in, use a web browser to open the page {flow['verification_uri']} and enter the code [bold green]{flow['user_code']}[/bold green] to authenticate."
+        log.info(
+            f"To sign in, use a web browser to open the page {flow['verification_uri']} and "
+            "enter the code [bold green]{flow['user_code']}[/bold green] to authenticate."
         )
 
         result = self._msal_app.acquire_token_by_device_flow(flow)
-        return validate_result(result)
+        return Authentication.validate_result(result)
 
     def logout(self) -> None:
         users = self._msal_app.get_accounts()
@@ -87,17 +87,36 @@ class Authentication:
     def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
-            console.print("[red]Not logged in, please login with:[/red]\nbevaring auth login")
+            log.error("[red]Not logged in, please login[/red]")
             raise AuthenticationError()
 
         # We only support one account at the moment
         account = accounts[0]
 
         result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
-        return validate_result(result)
+        return Authentication.validate_result(result)
 
     def _scope_builder(self, scope_name: str = None) -> str:
         if not scope_name:
             raise ValueError("Scope name is required")
 
-        return f"https://{state['endpoint']}/{scope_name}"
+        return f"https://{self.cfg.endpoint}/{scope_name}"
+
+    @staticmethod
+    def validate_result(result) -> dict:
+        if not result:
+            raise AuthenticationError("Could not login." + REAUTHENTICATE)
+
+        if "error" in result:
+            log.error(result)
+            raise AuthenticationError("Could not authenticate." + REAUTHENTICATE)
+
+        if "id_token_claims" in result:
+            id_token = result["id_token_claims"]
+            return {
+                **result,
+                "username": id_token["preferred_username"],
+                "tenant_id": id_token["tid"],
+            }
+
+        return result
