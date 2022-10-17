@@ -1,10 +1,10 @@
 import logging
-from __main__ import App
 
 import typer
+from bevaring_cli.commands.app import App
 from enterprython import component
 
-from bevaring_cli.cmd import Cmd
+from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.auth import Authentication
 
 log = logging.getLogger(__name__)

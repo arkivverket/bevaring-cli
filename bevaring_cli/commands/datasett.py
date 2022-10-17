@@ -1,14 +1,14 @@
 import logging
-from __main__ import App, BEVARING_CLI_APP_NAME
 
-from click import UUID
+from bevaring_cli import BEVARING_CLI_APP_NAME
+from bevaring_cli.commands.app import App
 from enterprython import component
 from rich.table import Table
 from toml import dump
 from typer import Argument, Option
 
 from bevaring_cli.bevaring_client import BevaringClient
-from bevaring_cli.cmd import Cmd
+from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE
 
 log = logging.getLogger(__name__)

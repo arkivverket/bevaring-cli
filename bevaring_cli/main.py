@@ -3,12 +3,15 @@ from logging.handlers import RotatingFileHandler
 from os.path import isfile
 from typing import List
 
-from enterprython import component, assemble, load_config
+from bevaring_cli.commands.app import App
+from enterprython import assemble, load_config
 from rich.logging import RichHandler
 
-from bevaring_cli import __version__, BEVARING_CLI_APP_NAME
-from bevaring_cli.cmd import Cmd
+from bevaring_cli import BEVARING_CLI_APP_NAME
+from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE
+
+from bevaring_cli.commands import *  # need this for automatic command injection
 
 consoleHandler = RichHandler(markup=True, show_path=False, show_time=False, show_level=False)
 consoleHandler.setFormatter(logging.Formatter("%(message)s", style='%'))
@@ -19,33 +22,22 @@ logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL D
 log = logging.getLogger(__name__)
 
 
-@component()
-class App(Cmd):
-
-    def __init__(self):
-        super().__init__()
-        self.register(self.version)
-
-    @staticmethod
-    def version() -> None:
-        """Prints the version"""
-        log.info(f"{BEVARING_CLI_APP_NAME} version {__version__}")
-
-
 def all_cmds(cmds: List[Cmd]) -> Cmd:
-    for cmd in cmds:
-        if type(cmd) == App:
-            return cmd
+    """Instantiates all command objects and return App instance (which is a command too)."""
+    return next(cmd for cmd in cmds if type(cmd) == App)
+
+
+def app() -> Cmd:
+    paths = ["app.toml"]
+    if isfile(SESSION_FILE):
+        paths += SESSION_FILE
+    load_config(app_name=BEVARING_CLI_APP_NAME.replace('-', '_'), paths=paths)
+    return assemble(all_cmds)
 
 
 if __name__ == "__main__":
     try:
-        from bevaring_cli.commands import *
-        paths = ["app.toml"]
-        if isfile(SESSION_FILE):
-            paths += SESSION_FILE
-        load_config(app_name=BEVARING_CLI_APP_NAME.replace('-', '_'), paths=paths)
-        assemble(all_cmds).run()
+        app().run()
     except (SystemExit, KeyboardInterrupt):
         raise
     except:
