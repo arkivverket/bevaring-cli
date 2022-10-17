@@ -5,7 +5,7 @@ from click import UUID
 from enterprython import component
 from rich.table import Table
 from toml import dump
-from typer import Argument
+from typer import Argument, Option
 
 from bevaring_cli.bevaring_client import BevaringClient
 from bevaring_cli.cmd import Cmd
@@ -41,9 +41,10 @@ class DatasettCmd(Cmd):
         self,
         datasett_id: str = Argument(..., help="Identifier of the dataset to check out."),
         email: str = Argument(..., help="Email address where to send progress notification."),
-        empty=True,
-        debug=False
+        empty: bool = Option(True, help="If true check out empty bucket"),
+        debug: bool = Option(False, help="Print complete response to console")
     ) -> None:
+        """Checks out given dataset into by default empty bucket. Response will be saved into hidden file."""
         json = self._bevaring().post(
             url='bevaring/checkout_dataset',
             data={
@@ -52,8 +53,10 @@ class DatasettCmd(Cmd):
                 'with_data': not empty,
                 'receipt_email': email
             }).json()
+
         with open(SESSION_FILE, 'w') as f:
             dump(json, f)
+
         if debug:
             table = Table("Datasett ID", "Session ID", "Bucket Name", "IAM Key", "IAM Secret")
             table.add_row(
