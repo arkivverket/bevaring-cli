@@ -8,7 +8,7 @@ from bevaring_cli import (
     BEVARING_CLI_APP_NAME,
     __version__,
 )
-from bevaring_cli.config import Config
+from bevaring_cli.config import Config, CONFIG_DIR
 from bevaring_cli.exceptions import AuthenticationError
 
 log = logging.getLogger(__name__)
@@ -26,11 +26,11 @@ class Authentication:
     def __init__(self, cfg: Config) -> None:
         self.cfg = cfg
         self.authority = "https://login.microsoftonline.com/organizations"
-        self.scopes = [self._scope_builder("User.Login")]
+        self.scopes = [f"https://{self.cfg.endpoint}/User.Login"]
 
     @property
     def _msal_app_kwargs(self) -> dict:
-        token_cache = PersistedTokenCache(FilePersistence(f"{self.cfg.config_dir}/msal_token_cache.json"))
+        token_cache = PersistedTokenCache(FilePersistence(f"{CONFIG_DIR}/msal_token_cache.json"))
         return {
             "token_cache": token_cache,
             "authority": self.authority,
@@ -95,12 +95,6 @@ class Authentication:
 
         result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
         return Authentication.validate_result(result)
-
-    def _scope_builder(self, scope_name: str = None) -> str:
-        if not scope_name:
-            raise ValueError("Scope name is required")
-
-        return f"https://{self.cfg.endpoint}/{scope_name}"
 
     @staticmethod
     def validate_result(result) -> dict:

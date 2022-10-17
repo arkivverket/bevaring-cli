@@ -1,3 +1,10 @@
 
-CLIENT_ID = 'd18685f9-148d-4e9a-98b3-194bcd01bc95'
-ENDPOINT = 'bevaring.dev.digitalarkivet.no'
+client_id = 'd18685f9-148d-4e9a-98b3-194bcd01bc95'
+endpoint = 'bevaring.dev.digitalarkivet.no'
+
+# will be overwritten in session.toml
+datasett_id = ''
+session_id = ''
+bucket_name = ''
+iam_access_key_id = ''
+iam_secret_access_key = ''

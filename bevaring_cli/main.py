@@ -1,5 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
+from os.path import isfile
 from typing import List
 
 from enterprython import component, assemble, load_config
@@ -7,6 +8,7 @@ from rich.logging import RichHandler
 
 from bevaring_cli import __version__, BEVARING_CLI_APP_NAME
 from bevaring_cli.cmd import Cmd
+from bevaring_cli.config import SESSION_FILE
 
 consoleHandler = RichHandler(markup=True, show_path=False, show_time=False, show_level=False)
 consoleHandler.setFormatter(logging.Formatter("%(message)s", style='%'))
@@ -38,8 +40,14 @@ def all_cmds(cmds: List[Cmd]) -> Cmd:
 
 if __name__ == "__main__":
     try:
-        load_config(app_name=BEVARING_CLI_APP_NAME, paths=["app.toml"])
+        from bevaring_cli.commands import *
+        paths = ["app.toml"]
+        if isfile(SESSION_FILE):
+            paths += SESSION_FILE
+        load_config(app_name=BEVARING_CLI_APP_NAME.replace('-', '_'), paths=paths)
         assemble(all_cmds).run()
+    except (SystemExit, KeyboardInterrupt):
+        raise
     except:
         log.exception("Command failed!")
         raise SystemExit(2)
