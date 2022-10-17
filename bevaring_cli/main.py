@@ -13,13 +13,13 @@ from bevaring_cli.config import SESSION_FILE
 
 from bevaring_cli.commands import *  # need this for automatic command injection
 
-consoleHandler = RichHandler(markup=True, show_path=False, show_time=False, show_level=False)
-consoleHandler.setFormatter(logging.Formatter("%(message)s", style='%'))
-fileHandler = RotatingFileHandler(BEVARING_CLI_APP_NAME + '.log', maxBytes=1_000_000, backupCount=3)
-fileHandler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
-logging.basicConfig(level=logging.INFO, handlers=[consoleHandler, fileHandler])  # Enable DEBUG log for entire script
+
+console_handler = RichHandler(markup=True, show_path=False, show_time=False, show_level=False)
+console_handler.setFormatter(logging.Formatter("%(message)s", style='%'))
+file_handler = RotatingFileHandler(BEVARING_CLI_APP_NAME + '.log', maxBytes=1_000_000, backupCount=3)
+file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
+logging.basicConfig(level=logging.INFO, handlers=[console_handler, file_handler])  # Enable DEBUG log for entire script
 logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL DEBUG logs
-log = logging.getLogger(__name__)
 
 
 def all_cmds(cmds: List[Cmd]) -> Cmd:
@@ -41,5 +41,6 @@ if __name__ == "__main__":
     except (SystemExit, KeyboardInterrupt):
         raise
     except:
+        log = logging.getLogger(__name__)
         log.exception("Command failed!")
         raise SystemExit(2)

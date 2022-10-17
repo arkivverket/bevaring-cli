@@ -6,6 +6,8 @@ from enterprython import component
 
 log = logging.getLogger(__name__)
 
+VERSION = f"{BEVARING_CLI_APP_NAME} version {__version__}"
+
 
 @component()
 class App(Cmd):
@@ -17,5 +19,4 @@ class App(Cmd):
     @staticmethod
     def version() -> None:
         """Prints the version"""
-        log.info(f"{BEVARING_CLI_APP_NAME} version {__version__}")
-
+        log.info(VERSION)
