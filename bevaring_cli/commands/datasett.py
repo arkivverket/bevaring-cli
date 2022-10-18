@@ -7,7 +7,7 @@ from enterprython import component
 from msal_extensions import FilePersistence
 from rich.table import Table
 from rich.console import Console
-from toml import dump, dumps
+from toml import dump
 from typer import Argument, Option
 
 from bevaring_cli.bevaring_client import BevaringClient
