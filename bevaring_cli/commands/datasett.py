@@ -4,6 +4,7 @@ from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.app import App
 from enterprython import component
 from rich.table import Table
+from rich.console import Console
 from toml import dump
 from typer import Argument, Option
 
@@ -24,8 +25,8 @@ class DatasettCmd(Cmd):
         self.register(self.checkout)
         app.add(self._app, "datasett")
 
-    def list(self) -> None:
-        response = self._bevaring().get('metadata/datasett?limit=2')
+    def list(self, limit: int = Option(2, help="Max amount of datasets to list")) -> None:
+        response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
         table = Table("Datasett ID", "Databehandler", "Merkelapp")
         for dataset in response.json()["result"]:
@@ -35,7 +36,7 @@ class DatasettCmd(Cmd):
                 dataset["merkelapp"],
             )
 
-        log.info(table)
+        Console().print(table)
 
     def checkout(
         self,
@@ -66,5 +67,5 @@ class DatasettCmd(Cmd):
                 json['iam_access_key_id'],
                 json['iam_secret_access_key'],
             )
-            log.info(table)
+            Console().print(table)
         log.info(f"Creation of the {json['bucket_name']} was triggered. Await email notification.")
