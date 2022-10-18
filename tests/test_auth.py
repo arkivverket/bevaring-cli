@@ -1,15 +1,23 @@
 import pytest
-
-from bevaring_cli.auth import Authentication, REAUTHENTICATE, COULD_NOT_LOGIN, COULD_NOT_AUTHENTICATE
-from bevaring_cli.exceptions import AuthenticationError
 from enterprython import assemble
+from enterprython._inject import ENTERPRYTHON_COMPONENTS, load_config
 
-from bevaring_cli.main import app
+from bevaring_cli.auth import Authentication, COULD_NOT_LOGIN, COULD_NOT_AUTHENTICATE
+from bevaring_cli.auth_prod import AuthenticationProd
+from bevaring_cli.exceptions import AuthenticationError
+
+
+def auth_prod() -> AuthenticationProd:
+    load_config(app_name='test', paths=['app.toml'])
+    auth = assemble(AuthenticationProd)
+    # Remove Prod version from container such that it will not conflict with the mock used in other tests.
+    # This is only needed due to bug in Enterprython where profiles are not working correctly.
+    ENTERPRYTHON_COMPONENTS.remove(next(a for a in ENTERPRYTHON_COMPONENTS if a.get_instance() == auth))
+    return auth
 
 
 def test_auth():
-    app()
-    auth = assemble(Authentication)
+    auth = auth_prod()
 
     assert auth._msal_app_instance is None
     assert auth.cfg.client_id == "d18685f9-148d-4e9a-98b3-194bcd01bc95"

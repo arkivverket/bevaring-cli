@@ -19,5 +19,5 @@ class BevaringClient:
     def __call__(self) -> Client:
         return Client(
             base_url=f'https://{self.cfg.endpoint}/api/',
-            headers={"Authorization": f"Bearer {self.auth.get_credentials()['access_token']}"}
+            headers={'Authorization': f"Bearer {self.auth.get_credentials()['access_token']}"}
         )

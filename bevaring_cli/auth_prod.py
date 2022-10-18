@@ -8,7 +8,7 @@ from bevaring_cli import (
     BEVARING_CLI_APP_NAME,
     __version__,
 )
-from bevaring_cli.auth import Authentication, COULD_NOT_LOGIN, COULD_NOT_AUTHENTICATE
+from bevaring_cli.auth import Authentication
 from bevaring_cli.config import Config, CONFIG_DIR
 from bevaring_cli.exceptions import AuthenticationError
 
@@ -94,22 +94,3 @@ class AuthenticationProd(Authentication):
 
         result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
         return Authentication.validate_result(result)
-
-    @staticmethod
-    def validate_result(result) -> dict:
-        if not result:
-            raise AuthenticationError(COULD_NOT_LOGIN)
-
-        if "error" in result:
-            log.error(result)
-            raise AuthenticationError(COULD_NOT_AUTHENTICATE)
-
-        if "id_token_claims" in result:
-            id_token = result["id_token_claims"]
-            return {
-                **result,
-                "username": id_token["preferred_username"],
-                "tenant_id": id_token["tid"],
-            }
-
-        return result

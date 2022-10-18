@@ -30,9 +30,11 @@ def all_cmds(cmds: List[Cmd]) -> Cmd:
 def app(profile='prod') -> Cmd:
     paths = ["app.toml"]
     if isfile(SESSION_FILE):
-        paths += SESSION_FILE
+        paths.append(SESSION_FILE)
     load_config(app_name=BEVARING_CLI_APP_NAME.replace('-', '_'), paths=paths)
-    if profile == 'prod':  # enterprython does not forward profile down component stack. So we have to simulate it here
+    if profile == 'prod':
+        # TODO: Enterprython does not forward profile down component stack. So we have to simulate it here by importing
+        # TODO: packages when necessary. Fix the bug in Enterprython.
         from bevaring_cli.auth_prod import AuthenticationProd
     return assemble(all_cmds)
 

@@ -1,6 +1,7 @@
 import logging
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
+from bevaring_cli.exceptions import AuthenticationError
 
 log = logging.getLogger(__name__)
 
@@ -14,3 +15,21 @@ class Authentication:
     def get_credentials(self) -> dict:
         raise NotImplementedError("Not yet implemented")
 
+    @staticmethod
+    def validate_result(result) -> dict:
+        if not result:
+            raise AuthenticationError(COULD_NOT_LOGIN)
+
+        if "error" in result:
+            log.error(result)
+            raise AuthenticationError(COULD_NOT_AUTHENTICATE)
+
+        if "id_token_claims" in result:
+            id_token = result["id_token_claims"]
+            return {
+                **result,
+                "username": id_token["preferred_username"],
+                "tenant_id": id_token["tid"],
+            }
+
+        return result

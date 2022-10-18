@@ -10,7 +10,7 @@ runner = CliRunner()
 
 def test_version(caplog):
     caplog.set_level(INFO)
-    result = runner.invoke(app()._app, ["version"])
+    result = runner.invoke(app('test')._app, ["version"])
     assert result.exit_code == 0
     assert len(caplog.messages) == 1
     assert caplog.messages[0] == VERSION
