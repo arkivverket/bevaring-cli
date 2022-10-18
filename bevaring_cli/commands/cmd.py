@@ -14,6 +14,9 @@ class Cmd:
         for name, cmd in kwargs:
             self._app.command(name)(cmd)
 
+    def callback(self, cmd: Callable) -> None:
+        self._app.callback()(cmd)
+
     def add(self, sub: Typer, name: str = None) -> None:
         self._app.add_typer(sub, name=name)
 

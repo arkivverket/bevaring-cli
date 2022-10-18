@@ -1,4 +1,5 @@
 import logging
+import sys
 from logging.handlers import RotatingFileHandler
 from os.path import isfile
 from typing import List
@@ -46,5 +47,5 @@ if __name__ == "__main__":
         raise
     except:
         log = logging.getLogger(__name__)
-        log.exception("Command failed!")
+        log.error(f"Command failed!\n{str(sys.exc_info()[1])}")
         raise SystemExit(2)
