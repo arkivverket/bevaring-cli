@@ -85,3 +85,40 @@ class DatasettCmd(Cmd):
                 )
                 Console().print(table)
             log.info(f"Creation of the {json['bucket_name']} was triggered. Await email notification.")
+
+    def copy(
+        self,
+        datasett_id: str = Argument(..., help="Identifier of the dataset to copy."),
+        user_has_bucket: bool = Argument(False, help="If user has a target bucket to copy to."),
+        bucket_name: str = Option(..., help="Name of the target bucket."),
+        iam_access_key_id: str = Option(..., help="IAM acces key id if user has a bucket."),
+        iam_secret_access_key: str = Option(..., help="IAM secret access key if user has a bucket."),
+        s3_path: str = Option(..., help="Root-folder within bucket where the dataset should be copied."),
+        s3_logfiles_path: str = Option(..., help="Root-folder within bucket where logfiles should be stored."),
+        generation_name: str = Option(..., help="Which generation to copy."),
+        receipt_email: str = Option(..., help="Email address where to send progress notification."),
+        debug: bool = Option(False, help="Print complete response to console"),
+        endpoint: str = Option('', help="The endpoint to use for the API")
+    ) -> None:
+        """Initiates copying of a chosen generation of a dataset into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
+        response = self._bevaring().get(
+            # temp url for local testing
+            url='http://localhost:8000/bevaring/copy_dataset',
+            json={
+                'client_name': BEVARING_CLI_APP_NAME,
+                'datasett_id': datasett_id,
+                'user_has_bucket': user_has_bucket,
+                'bucket_name': bucket_name,
+                'iam_access_key_id': iam_access_key_id,
+                'iam_secret_access_key': iam_secret_access_key,
+                's3_path': s3_path,
+                's3_logfiles_path': s3_logfiles_path,
+                'generation_name': generation_name,
+                'receipt_email': receipt_email
+            }
+        )
+
+        response.raise_for_status()
+        json = response.json()
+
+        Console().print(json)
