@@ -18,10 +18,10 @@ class Authentication:
     def logout(self) -> None:
         raise NotImplementedError("Not yet implemented")
 
-    def login_with_device_code(self) -> None:
+    def login_with_device_code(self) -> dict:
         raise NotImplementedError("Not yet implemented")
 
-    def login_interactive(self) -> None:
+    def login_interactive(self) -> dict:
         raise NotImplementedError("Not yet implemented")
 
     @staticmethod
