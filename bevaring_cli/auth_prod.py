@@ -1,7 +1,8 @@
 import logging
 
 import msal
-from enterprython import component
+from attrs import define
+from enterprython import component, setting
 from msal_extensions import FilePersistence, PersistedTokenCache
 
 from bevaring_cli import (
@@ -9,23 +10,26 @@ from bevaring_cli import (
     __version__,
 )
 from bevaring_cli.auth import Authentication
-from bevaring_cli.config import Config, CONFIG_DIR
+from bevaring_cli.config import CONFIG_DIR
 from bevaring_cli.exceptions import AuthenticationError
 
 log = logging.getLogger(__name__)
 
 
 @component()
+@define
 class AuthenticationProd(Authentication):
     """
     We use the prefix _msal to identify variables and methods used for the MSAL library
     """
     _msal_app_instance = None
 
-    def __init__(self, cfg: Config) -> None:
-        self.cfg = cfg
+    client_id: str = setting('CLIENT_ID')
+    endpoint: str = setting('ENDPOINT')
+
+    def __attrs_post_init__(self) -> None:
         self.authority = "https://login.microsoftonline.com/organizations"
-        self.scopes = [f"https://{cfg.endpoint}/User.Login"]
+        self.scopes = [f"https://{self.endpoint}/User.Login"]
 
     @property
     def _msal_app_kwargs(self) -> dict:
@@ -43,7 +47,7 @@ class AuthenticationProd(Authentication):
         Returns the MSAL application object
         """
         if not self._msal_app_instance:
-            self._msal_app_instance = msal.PublicClientApplication(client_id=self.cfg.client_id,
+            self._msal_app_instance = msal.PublicClientApplication(client_id=self.client_id,
                                                                    **self._msal_app_kwargs)
 
         return self._msal_app_instance

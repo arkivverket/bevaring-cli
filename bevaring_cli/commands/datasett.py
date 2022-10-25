@@ -1,6 +1,8 @@
 import logging
 import textwrap
 
+from attrs import define
+
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.app import App
 from enterprython import component

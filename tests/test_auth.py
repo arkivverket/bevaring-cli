@@ -20,7 +20,7 @@ def test_auth():
     auth = auth_prod()
 
     assert auth._msal_app_instance is None
-    assert auth.cfg.client_id == "d18685f9-148d-4e9a-98b3-194bcd01bc95"
+    assert auth.client_id == "d18685f9-148d-4e9a-98b3-194bcd01bc95"
     assert auth.authority == "https://login.microsoftonline.com/organizations"
     assert auth.scopes == ["https://bevaring.dev.digitalarkivet.no/User.Login"]
 
