@@ -15,6 +15,15 @@ class Authentication:
     def get_credentials(self) -> dict:
         raise NotImplementedError("Not yet implemented")
 
+    def logout(self) -> None:
+        raise NotImplementedError("Not yet implemented")
+
+    def login_with_device_code(self) -> None:
+        raise NotImplementedError("Not yet implemented")
+
+    def login_interactive(self) -> None:
+        raise NotImplementedError("Not yet implemented")
+
     @staticmethod
     def validate_result(result) -> dict:
         if not result:

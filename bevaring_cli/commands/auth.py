@@ -1,6 +1,8 @@
 import logging
 
 import typer
+from typer import Option
+
 from bevaring_cli.commands.app import App
 from enterprython import component
 
@@ -21,12 +23,13 @@ class AuthCmd(Cmd):
 
     def login(
         self,
-        use_device_code: bool = typer.Option(
+        use_device_code: bool = Option(
             False,
             "--use-device-code",
             help="Use device code flow, suitable for when running the CLI on a machine "
                  "that does not have a browser installed.",
         ),
+        endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
         """
         Login with Azure AD

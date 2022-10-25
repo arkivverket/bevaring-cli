@@ -1,18 +1,16 @@
 import logging
 import textwrap
 
-from attrs import define
-
-from bevaring_cli import BEVARING_CLI_APP_NAME
-from bevaring_cli.commands.app import App
 from enterprython import component
 from msal_extensions import FilePersistence
-from rich.table import Table
 from rich.console import Console
+from rich.table import Table
 from toml import dump
 from typer import Argument, Option
 
+from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.bevaring_client import BevaringClient
+from bevaring_cli.commands.app import App
 from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE
 
