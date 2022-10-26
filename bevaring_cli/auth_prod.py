@@ -98,3 +98,7 @@ class AuthenticationProd(Authentication):
 
         result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
         return Authentication.validate_result(result)
+
+    def __hash__(self) -> int:
+        return hash(self.client_id)
+
