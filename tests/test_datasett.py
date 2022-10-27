@@ -1,3 +1,5 @@
+import os
+from os import path
 from os.path import expanduser
 import re
 
@@ -7,7 +9,7 @@ from typer.testing import CliRunner
 
 from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE
 from bevaring_cli.main import app
-from tests.auth_mock import AuthMock
+from tests.auth_mock import AuthMock  # noqa: F401
 
 runner = CliRunner()
 
@@ -24,6 +26,15 @@ expected_creds = """
 aws_secret_access_key = ik
 aws_access_key_id = is
 """
+
+
+def setup_function(function):
+    assert not path.exists(SESSION_FILE), f"Session file exists: {SESSION_FILE}. Please move it to another place."
+
+
+def teardown_function(function):
+    if path.exists(SESSION_FILE):
+        os.remove(SESSION_FILE)
 
 
 def test_checkout_saves_session(httpx_mock: HTTPXMock):

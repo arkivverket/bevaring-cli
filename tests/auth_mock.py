@@ -8,4 +8,3 @@ class AuthMock(Authentication):
 
     def get_credentials(self) -> dict:
         return {'access_token': 'test'}
-
