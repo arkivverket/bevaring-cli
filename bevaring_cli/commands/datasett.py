@@ -1,7 +1,8 @@
 import logging
 import textwrap
 
-from enterprython import component
+from attrs import define
+from enterprython import component, setting
 from msal_extensions import FilePersistence
 from rich.console import Console
 from rich.table import Table
@@ -13,18 +14,27 @@ from bevaring_cli.bevaring_client import BevaringClient
 from bevaring_cli.commands.app import App
 from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE
+from bevaring_cli.exceptions import ensure_success
 
 log = logging.getLogger(__name__)
 
 
 @component()
+@define(slots=False)
 class DatasettCmd(Cmd):
 
-    def __init__(self, app: App, bevaring: BevaringClient):
+    _main: App
+    _bevaring: BevaringClient
+    datasett_id: str = setting('DATASETT_ID')
+    session_id: str = setting('SESSION_ID')
+    bucket_name: str = setting('BUCKET_NAME')
+    iam_access_key_id: str = setting('IAM_ACCESS_KEY_ID')
+    iam_secret_access_key: str = setting('IAM_SECRET_ACCESS_KEY')
+
+    def __attrs_post_init__(self):
         super().__init__()
-        self._bevaring = bevaring
         self.register(self.list, self.checkout)
-        app.add(self._app, 'datasett')
+        self._main.add(self._app, 'datasett')
 
     def list(
         self,
@@ -52,6 +62,10 @@ class DatasettCmd(Cmd):
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
         """Checks out given dataset into by default empty bucket. Response will be saved into hidden file."""
+
+        if self.session_id:
+            raise Exception(f"You have an opened session ({self.session_id}). Please close it first.")
+
         response = self._bevaring().post(
             url='bevaring/checkout_dataset',
             json={
@@ -62,7 +76,7 @@ class DatasettCmd(Cmd):
             }
         )
 
-        response.raise_for_status()
+        ensure_success(response)
         json = response.json()
 
         if 'bucket_name' in json:

@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 @component()
-@define
+@define(hash=True)
 class AuthenticationProd(Authentication):
     """
     We use the prefix _msal to identify variables and methods used for the MSAL library
@@ -98,7 +98,3 @@ class AuthenticationProd(Authentication):
 
         result = self._msal_app.acquire_token_silent(scopes=self.scopes, account=account)
         return Authentication.validate_result(result)
-
-    def __hash__(self) -> int:
-        return hash(self.client_id)
-
