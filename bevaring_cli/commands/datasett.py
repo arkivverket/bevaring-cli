@@ -120,5 +120,6 @@ class DatasettCmd(Cmd):
 
         response.raise_for_status()
         json = response.json()
-
-        Console().print(json)
+        # Finn en god måte å sjekke om ting gikk bra eller ikke
+        if 'bucket_name' in json:
+            Console().print("Copying of dataset initiated... Await email confirmation when the copying is complete.")
