@@ -1,7 +1,4 @@
-import logging
-from sys import exc_info
-
-from httpx import HTTPStatusError, Response
+from httpx import Response
 
 
 class AuthenticationError(Exception):
