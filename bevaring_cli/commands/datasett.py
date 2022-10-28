@@ -23,7 +23,7 @@ class DatasettCmd(Cmd):
     def __init__(self, app: App, bevaring: BevaringClient):
         super().__init__()
         self._bevaring = bevaring
-        self.register(self.list, self.checkout)
+        self.register(self.list, self.checkout, self.copy)
         app.add(self._app, 'datasett')
 
     def list(
@@ -90,13 +90,13 @@ class DatasettCmd(Cmd):
         self,
         datasett_id: str = Argument(..., help="Identifier of the dataset to copy."),
         user_has_bucket: bool = Argument(False, help="If user has a target bucket to copy to."),
-        bucket_name: str = Option(..., help="Name of the target bucket."),
-        iam_access_key_id: str = Option(..., help="IAM acces key id if user has a bucket."),
-        iam_secret_access_key: str = Option(..., help="IAM secret access key if user has a bucket."),
-        s3_path: str = Option(..., help="Root-folder within bucket where the dataset should be copied."),
-        s3_logfiles_path: str = Option(..., help="Root-folder within bucket where logfiles should be stored."),
-        generation_name: str = Option(..., help="Which generation to copy."),
-        receipt_email: str = Option(..., help="Email address where to send progress notification."),
+        bucket_name: str = Option('', help="Name of the target bucket."),
+        iam_access_key_id: str = Option('', help="IAM acces key id if user has a bucket."),
+        iam_secret_access_key: str = Option('', help="IAM secret access key if user has a bucket."),
+        s3_path: str = Option('', help="Root-folder within bucket where the dataset should be copied."),
+        s3_logfiles_path: str = Option('', help="Root-folder within bucket where logfiles should be stored."),
+        generation_name: str = Option('', help="Which generation to copy."),
+        receipt_email: str = Option('', help="Email address for progress notification."),
         debug: bool = Option(False, help="Print complete response to console"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
@@ -120,6 +120,17 @@ class DatasettCmd(Cmd):
 
         response.raise_for_status()
         json = response.json()
+
+        log.info(json)
+
+        #datasett_id: UUID = Field(description="Identifikator av datasettet i Bevaring som ble sjekket ut")
+        #session_id: UUID = Field(description="Unik identifikator av sesjonen denne operasjonen har startet")
+        #bucket_name: str = Field(description="Navn på midlertidig S3 Bucket som er tilgjengelig for videre arbeid")
+        #iam_access_key_id: str = Field(description="IAM nøkkel for å gjøre operasjoner mot S3. Del av et par")
+        #iam_secret_access_key: str = Field(description="Hemmelig IAM nøkkel for å gjøre operasjoner mot S3. Del av et par")
+        #s3_path: str | None = Field(description="Rot-mappe innenfor Bucket for å legge arkivuttrekket - innholdet i Tar-filen")
+        #s3_logfiles_path: str | None = Field(description="Rot-mappe innenfor Bucket for å legge logg-filene som Mottak har generert")
+
         # Finn en god måte å sjekke om ting gikk bra eller ikke
         if 'bucket_name' in json:
             Console().print("Copying of dataset initiated... Await email confirmation when the copying is complete.")
