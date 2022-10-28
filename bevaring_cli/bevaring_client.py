@@ -8,7 +8,7 @@ from bevaring_cli.auth import Authentication
 
 
 @component()
-@define
+@define(hash=True)
 class BevaringClient:
     """Lazily initialized Bevaring rest API client. Contains authorization headers."""
     auth: Authentication
@@ -20,6 +20,3 @@ class BevaringClient:
             base_url=f'https://{self.endpoint}/api/',
             headers={'Authorization': f"Bearer {self.auth.get_credentials()['access_token']}"}
         )
-
-    def __hash__(self) -> int:
-        return hash(self.endpoint) + hash(self.auth)

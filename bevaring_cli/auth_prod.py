@@ -17,7 +17,7 @@ log = logging.getLogger(__name__)
 
 
 @component()
-@define
+@define(hash=True)
 class AuthenticationProd(Authentication):
     """
     We use the prefix _msal to identify variables and methods used for the MSAL library

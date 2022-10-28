@@ -1,5 +1,4 @@
 import logging
-import sys
 from logging.handlers import RotatingFileHandler
 from os.path import isfile
 from typing import List
@@ -12,7 +11,7 @@ from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE
 
-from bevaring_cli.commands import *  # need this for automatic command injection
+from bevaring_cli.commands import *  # noqa: F401,F403 need this for automatic command injection
 
 
 console_handler = RichHandler(markup=True, show_path=False, show_time=False, show_level=False)
@@ -36,7 +35,7 @@ def app(profile='prod') -> Cmd:
     if profile == 'prod':
         # TODO: Enterprython does not forward profile down component stack. So we have to simulate it here by importing
         # TODO: packages when necessary. Fix the bug in Enterprython.
-        from bevaring_cli.auth_prod import AuthenticationProd
+        from bevaring_cli.auth_prod import AuthenticationProd  # noqa: F401
     return assemble(all_cmds)
 
 
@@ -45,7 +44,7 @@ if __name__ == "__main__":
         app().run()
     except (SystemExit, KeyboardInterrupt):
         raise
-    except:
+    except Exception as e:
         log = logging.getLogger(__name__)
-        log.error(f"Command failed!\n{str(sys.exc_info()[1])}")
+        log.error(f"Command failed!\n{str(e)}")
         raise SystemExit(2)
