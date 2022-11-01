@@ -3,7 +3,7 @@ import logging
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.exceptions import AuthenticationError
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 REAUTHENTICATE = " Please try to re-authenticate with: " + BEVARING_CLI_APP_NAME + " auth login"
 COULD_NOT_AUTHENTICATE = "Could not authenticate." + REAUTHENTICATE
@@ -30,7 +30,7 @@ class Authentication:
             raise AuthenticationError(COULD_NOT_LOGIN)
 
         if "error" in result:
-            log.error(result)
+            logger.error(result)
             raise AuthenticationError(COULD_NOT_AUTHENTICATE)
 
         if "id_token_claims" in result:

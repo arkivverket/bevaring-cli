@@ -16,7 +16,7 @@ from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE
 from bevaring_cli.exceptions import ensure_success
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -98,4 +98,4 @@ class DatasettCmd(Cmd):
                     json['iam_secret_access_key'],
                 )
                 Console().print(table)
-            log.info(f"Creation of the {json['bucket_name']} was triggered. Await email notification.")
+            logger.info(f"Creation of the {json['bucket_name']} was triggered. Await email notification.")

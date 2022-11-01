@@ -9,7 +9,7 @@ from enterprython import component
 from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.auth import Authentication
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -45,13 +45,13 @@ class AuthCmd(Cmd):
             result = self._auth.login_interactive()
 
         if result:
-            log.info(f"Successfully logged in as [green]{result['username']}[/green]")
+            logger.info(f"Successfully logged in as [green]{result['username']}[/green]")
 
     def logout(self) -> None:
         """
         Logout from Azure AD
         """
-        log.info("Logging out...")
+        logger.info("Logging out...")
         self._auth.logout()
 
     def debug_jwt(

@@ -45,6 +45,6 @@ if __name__ == "__main__":
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        log = logging.getLogger(__name__)
-        log.error(f"Command failed!\n{str(e)}")
+        logger = logging.getLogger(__name__)
+        logger.error(f"Command failed!\n{str(e)}")
         raise SystemExit(2)

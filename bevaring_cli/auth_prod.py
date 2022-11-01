@@ -13,7 +13,7 @@ from bevaring_cli.auth import Authentication
 from bevaring_cli.config import CONFIG_DIR
 from bevaring_cli.exceptions import AuthenticationError
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -56,9 +56,9 @@ class AuthenticationProd(Authentication):
         """
         Acquires a token for the application
         """
-        log.info("A web browser has been opened at "
+        logger.info("A web browser has been opened at "
                  "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
-        log.info("Please continue the login in the web browser. "
+        logger.info("Please continue the login in the web browser. "
                  "If no web browser is available or if the web browser fails to open, "
                  "use device code flow with `bevaring auth login --use-device-code`.")
 
@@ -73,7 +73,7 @@ class AuthenticationProd(Authentication):
         if "user_code" not in flow:
             raise ValueError("Could not initiate device flow")
 
-        log.info(
+        logger.info(
             f"To sign in, use a web browser to open the page {flow['verification_uri']} and "
             "enter the code [bold green]{flow['user_code']}[/bold green] to authenticate."
         )
@@ -90,7 +90,7 @@ class AuthenticationProd(Authentication):
     def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
-            log.error("[red]Not logged in, please login[/red]")
+            logger.error("[red]Not logged in, please login[/red]")
             raise AuthenticationError()
 
         # We only support one account at the moment
