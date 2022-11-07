@@ -9,7 +9,7 @@ from rich.logging import RichHandler
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import SESSION_FILE
+from bevaring_cli.config import COPY_FILE, CREDENTIALS_FILE, SESSION_FILE
 
 from bevaring_cli.commands import *  # noqa: F401,F403 need this for automatic command injection
 
@@ -21,6 +21,9 @@ file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(messag
 logging.basicConfig(level=logging.INFO, handlers=[console_handler, file_handler])  # Enable DEBUG log for entire script
 logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL DEBUG logs
 
+print(SESSION_FILE)
+print(COPY_FILE)
+print(CREDENTIALS_FILE)
 
 def all_cmds(cmds: List[Cmd]) -> Cmd:
     """Instantiates all command objects and return App instance (which is a command too)."""
