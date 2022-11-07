@@ -1,6 +1,6 @@
 import logging
 from logging.handlers import RotatingFileHandler
-from os.path import isfile
+from os.path import isfile, dirname
 from typing import List
 
 from bevaring_cli.commands.app import App
@@ -28,7 +28,7 @@ def all_cmds(cmds: List[Cmd]) -> Cmd:
 
 
 def app(profile='prod') -> Cmd:
-    paths = ["app.toml"]
+    paths = [f"{dirname(__file__)}/app.toml"]
     if isfile(SESSION_FILE):
         paths.append(SESSION_FILE)
     load_config(app_name=BEVARING_CLI_APP_NAME.replace('-', '_'), paths=paths)
@@ -37,7 +37,6 @@ def app(profile='prod') -> Cmd:
         # TODO: packages when necessary. Fix the bug in Enterprython.
         from bevaring_cli.auth_prod import AuthenticationProd  # noqa: F401
     return assemble(all_cmds)
-
 
 if __name__ == "__main__":
     try:

@@ -8,7 +8,7 @@ from bevaring_cli.exceptions import AuthenticationError
 
 
 def auth_prod() -> AuthenticationProd:
-    load_config(app_name='test', paths=['app.toml'])
+    load_config(app_name='test', paths=['bevaring_cli/app.toml'])
     auth = assemble(AuthenticationProd)
     # Remove Prod version from container such that it will not conflict with the mock used in other tests.
     # This is only needed due to bug in Enterprython where profiles are not working correctly.
