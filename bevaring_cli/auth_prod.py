@@ -57,10 +57,10 @@ class AuthenticationProd(Authentication):
         Acquires a token for the application
         """
         logger.info("A web browser has been opened at "
-                 "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
+                    "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
         logger.info("Please continue the login in the web browser. "
-                 "If no web browser is available or if the web browser fails to open, "
-                 "use device code flow with `bevaring auth login --use-device-code`.")
+                    "If no web browser is available or if the web browser fails to open, "
+                    "use device code flow with `bevaring auth login --use-device-code`.")
 
         result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
         return Authentication.validate_result(result)
