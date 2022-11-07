@@ -38,7 +38,12 @@ def app(profile='prod') -> Cmd:
         from bevaring_cli.auth_prod import AuthenticationProd  # noqa: F401
     return assemble(all_cmds)
 
-if __name__ == "__main__":
+
+def main():
+    """
+    Main application entry point used when running as python module or pipx executable
+    (see pyproject.toml[tool.poetry.scripts]).
+    """
     try:
         app().run()
     except (SystemExit, KeyboardInterrupt):
@@ -47,3 +52,7 @@ if __name__ == "__main__":
         logger = logging.getLogger(__name__)
         logger.error(f"Command failed!\n{str(e)}")
         raise SystemExit(2)
+
+
+if __name__ == "__main__":
+    main()
