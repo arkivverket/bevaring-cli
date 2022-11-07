@@ -17,8 +17,8 @@ class Cmd:
     def callback(self, cmd: Callable) -> None:
         self._app.callback()(cmd)
 
-    def add(self, sub: Typer, name: str = None) -> None:
-        self._app.add_typer(sub, name=name)
+    def add(self, sub: Typer, name: str = None, help: str = None) -> None:
+        self._app.add_typer(sub, name=name, help=help)
 
     def run(self) -> None:
         self._app()

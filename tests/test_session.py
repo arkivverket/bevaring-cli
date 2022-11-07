@@ -1,13 +1,12 @@
 import os
-from os import path
-from os.path import expanduser
 import re
+from os import path
 
 from pytest_httpx import HTTPXMock
 from toml import load
 from typer.testing import CliRunner
 
-from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE
+from bevaring_cli.config import SESSION_FILE
 from bevaring_cli.main import app
 from tests.auth_mock import AuthMock  # noqa: F401
 
@@ -22,9 +21,11 @@ expected_session = {
 }
 
 expected_creds = """
-[default]
-aws_secret_access_key = ik
-aws_access_key_id = is
+alias awsb='aws --endpoint-url https://s3-oslo.arkivverket.no'
+export AWS_REGION=oslo
+export AWS_ACCESS_KEY_ID=ik
+export AWS_SECRET_ACCESS_KEY=is
+
 """
 
 
@@ -43,17 +44,18 @@ def test_checkout_saves_session(httpx_mock: HTTPXMock):
         url=re.compile('^.*bevaring/checkout_dataset.*$'),
         json=expected_session
     )
-    result = runner.invoke(app('test')._app, ["datasett", "checkout", "123", "test@test"])
+    result = runner.invoke(app('test')._app, ["session", "checkout", "123", "test@test"])
 
     assert result.exit_code == 0
     actual = load(SESSION_FILE)
     assert expected_session == actual
 
 
-def test_checkout_saves_aws_credentials(httpx_mock: HTTPXMock):
+def test_aws_credentials_are_printed(httpx_mock: HTTPXMock):
     test_checkout_saves_session(httpx_mock)
-    with open(expanduser(CREDENTIALS_FILE)) as f:
-        assert expected_creds == f.read()
+    result = runner.invoke(app('test')._app, ["session", "aws"])
+    assert result.exit_code == 0
+    assert result.stdout == expected_creds
 
 
 def test_authorization_headers_are_added(httpx_mock: HTTPXMock):
@@ -63,6 +65,6 @@ def test_authorization_headers_are_added(httpx_mock: HTTPXMock):
         json=expected_session,
         match_headers={'Authorization': "Bearer test"}
     )
-    result = runner.invoke(app('test')._app, ["datasett", "checkout", "123", "test@test"])
+    result = runner.invoke(app('test')._app, ["session", "checkout", "123", "test@test"])
 
     assert result.exit_code == 0
