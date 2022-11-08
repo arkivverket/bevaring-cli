@@ -18,7 +18,7 @@ class AuthCmd(Cmd):
     def __init__(self, app: App, auth: Authentication):
         super().__init__()
         self._auth = auth
-        self.register(self.login, self.logout)
+        self.register(self.login, self.logout, self.debug_jwt)
         app.add(self._app, name='auth', help='Login and logout for bevaring')
 
     def login(
