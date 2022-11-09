@@ -26,11 +26,11 @@ class Authentication:
     @staticmethod
     def validate_result(result) -> dict:
         if not result:
-            raise AuthenticationError(COULD_NOT_LOGIN)
+            raise AuthenticationError(COULD_NOT_LOGIN, 10)
 
         if "error" in result:
             logger.error(result)
-            raise AuthenticationError(COULD_NOT_AUTHENTICATE)
+            raise AuthenticationError(COULD_NOT_AUTHENTICATE, 11)
 
         if "id_token_claims" in result:
             id_token = result["id_token_claims"]

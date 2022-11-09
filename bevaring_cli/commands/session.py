@@ -58,12 +58,7 @@ class SessionCmd(Cmd):
         """Prints (but not logs) environment variables for use with aws cli."""
         if not self.session_id:
             raise Exception("You do not have an opened session. Please checkout first.")
-        Console().print(dedent(f"""
-            alias awsb='aws --endpoint-url https://s3-oslo.arkivverket.no'
-            export AWS_REGION=oslo
-            export AWS_ACCESS_KEY_ID={self.iam_access_key_id}
-            export AWS_SECRET_ACCESS_KEY={self.iam_secret_access_key}
-        """))
+        self.aws_export(self.iam_access_key_id, self.iam_secret_access_key)
 
     def request_checkout(self, datasett_id: str, email: str, empty: bool) -> Response:
         if self.session_id:
@@ -79,7 +74,7 @@ class SessionCmd(Cmd):
         )
 
     @staticmethod
-    def print(json: Any):
+    def print(json: Any) -> None:
         table = Table("Datasett ID", "Session ID", "Bucket Name", "IAM Key", "IAM Secret")
         table.add_row(
             json['datasett_id'],
@@ -91,6 +86,15 @@ class SessionCmd(Cmd):
         Console().print(table)
 
     @staticmethod
-    def persist(json: Any):
+    def persist(json: Any) -> None:
         with open(SESSION_FILE, 'w') as f:
             dump(json, f)
+
+    @staticmethod
+    def aws_export(key: str, secret: str) -> None:
+        Console().print(dedent(f"""
+            alias awsb='aws --endpoint-url https://s3-oslo.arkivverket.no'
+            export AWS_REGION=oslo
+            export AWS_ACCESS_KEY_ID={key}
+            export AWS_SECRET_ACCESS_KEY={secret}
+        """))
