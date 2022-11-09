@@ -5,13 +5,15 @@ from logging.handlers import RotatingFileHandler
 from os.path import isfile, dirname, join
 from typing import List
 
+from toml import load
+
 from bevaring_cli.commands.app import App
 from enterprython import assemble, load_config
 from rich.logging import RichHandler
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import SESSION_FILE, CONFIG_DIR
+from bevaring_cli.config import SESSION_FILE, CONFIG_DIR, DEFAULTS
 
 from glob import glob
 
@@ -47,6 +49,9 @@ def app(profile='prod') -> Cmd:
     # TODO: Enterprython does not forward profile down component stack. So we have to simulate it here by importing
     # TODO: packages when necessary. Fix the bug in Enterprython.
     import_components(lambda file: not file.endswith('_prod') or profile == 'prod')
+    for path in paths:
+        for key, value in load(path).items():
+            DEFAULTS[key] = value
     return assemble(all_cmds)
 
 
