@@ -27,6 +27,16 @@ aws_secret_access_key = ik
 aws_access_key_id = is
 """
 
+# TODO create test strings
+# Consider pytest.fixture
+expected_copy_creds = """
+
+"""
+
+expected_copy_creds_user_has_bucket = """
+
+"""
+
 
 def setup_function(function):
     assert not path.exists(SESSION_FILE), f"Session file exists: {SESSION_FILE}. Please move it to another place."
@@ -66,3 +76,25 @@ def test_authorization_headers_are_added(httpx_mock: HTTPXMock):
     result = runner.invoke(app('test')._app, ["datasett", "checkout", "123", "test@test"])
 
     assert result.exit_code == 0
+
+
+# TODO tests
+def test_copy_saves_credentials(httpx_mock: HTTPXMock):
+    httpx_mock.add_response(
+        method='POST',
+        url=re.compile('^.*bevaring/copy_dataset.*$'),
+        json=expected_session
+    )
+
+    result = runner.invoke(app('test')._app, ["datasett", "copy", "123"])
+
+    print(result)
+
+    assert result.exit_code == 0
+
+# test_copy_saves_credentials_no_bucket
+# test_copy_saves_credentials_user_has_bucket
+# test_list_copies
+# test index
+# test alias/id
+# test Exception existing id

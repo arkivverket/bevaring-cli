@@ -1,5 +1,6 @@
 import logging
 import textwrap
+import toml
 
 from attrs import define
 from enterprython import component, setting
@@ -33,35 +34,41 @@ class DatasettCmd(Cmd):
 
     def __attrs_post_init__(self):
         super().__init__()
-        self.register(self.list, self.checkout, self.copy)
+        self.register(self.list, self.checkout, self.copy, self.aws)
         self._main.add(self._app, 'datasett')
 
     def list(
         self,
-        limit: int = Option(2, help="Max amount of datasets to list"),
+        limit: int = Option(2, help="Max amount of datasetts to list"),
+        copies: bool = Option(None, help="Lists all locally stored credentials from the copy operation"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
-        response = self._bevaring().get(f'metadata/datasett?limit={limit}')
+        if copies:
+            copy_credentials = FilePersistence(COPY_FILE)
+            content = copy_credentials.load()
+            print(content)
+        else:
+            response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
-        table = Table("Datasett ID", "Databehandler", "Merkelapp")
-        for dataset in response.json()['result']:
-            table.add_row(
-                dataset['datasett_id'],
-                dataset['databehandler'],
-                dataset['merkelapp'],
-            )
+            table = Table("Datasett ID", "Databehandler", "Merkelapp")
+            for datasett in response.json()['result']:
+                table.add_row(
+                    datasett['datasett_id'],
+                    datasett['databehandler'],
+                    datasett['merkelapp'],
+                )
 
-        Console().print(table)
+            Console().print(table)
 
     def checkout(
         self,
-        datasett_id: str = Argument(..., help="Identifier of the dataset to check out."),
+        datasett_id: str = Argument(..., help="Identifier of the datasett to check out."),
         email: str = Argument(..., help="Email address where to send progress notification."),
         empty: bool = Option(True, help="If true check out empty bucket"),
         debug: bool = Option(False, help="Print complete response to console"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
-        """Checks out given dataset into by default empty bucket. Response will be saved into hidden file."""
+        """Checks out given datasett into by default empty bucket. Response will be saved into hidden file."""
 
         if self.session_id:
             raise Exception(f"You have an opened session ({self.session_id}). Please close it first.")
@@ -102,19 +109,19 @@ class DatasettCmd(Cmd):
 
     def copy(
         self,
-        datasett_id: str = Argument(..., help="Identifier of the dataset to copy."),
+        datasett_id: str = Argument(..., help="Identifier of the datasett to copy."),
         user_has_bucket: bool = Argument(False, help="If user has a target bucket to copy to."),
-        id: str = Option(None, help="TBD"),
+        id: str = Option(None, help="User defined id for locally stored credentials."),
         bucket_name: str = Option(None, help="Name of the target bucket."),
         iam_access_key_id: str = Option(None, help="IAM acces key id if user has a bucket."),
         iam_secret_access_key: str = Option(None, help="IAM secret access key if user has a bucket."),
-        s3_path: str = Option(None, help="Root-folder within bucket where the dataset should be copied."),
+        s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied."),
         generation_name: str = Option(None, help="Which generation to copy."),
         receipt_email: str = Option(None, help="Email address for progress notification."),
         debug: bool = Option(False, help="Print complete response to console"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
-        """Initiates copying of a chosen generation of a dataset into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
+        """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(
             # temp url for local testing
             url='http://localhost:8000/bevaring/copy_dataset',
@@ -134,25 +141,49 @@ class DatasettCmd(Cmd):
         ensure_success(response)
         json = response.json()
 
-        log.info(json)
-
         if 'bucket_name' in json:
-            copy_credentials = FilePersistence(COPY_FILE)    
-            content = copy_credentials.load()
-            # TODO: Implement id counter and user defined id
-            copy_credentials_id = 1
+            copy_dict = toml.load(COPY_FILE)
+            existing_ids = []
 
-            new_copy_credentials = (textwrap.dedent(f"""
-                [id = {copy_credentials_id}]
-                target_s3_uri = {json['target_s3_uri']}
-                iam_access_key_id = {json['iam_access_key_id']}
-                iam_secret_access_key = {json['iam_secret_access_key']}
-                expiry_date = "Not yet implemented"
-                """))
+            for key in copy_dict:
+                existing_ids.append(key)
 
-            content += new_copy_credentials
-            copy_credentials.save(content)
+            if id:
+                if id not in existing_ids:
+                    copy_credentials_id = id
+                else:
+                    raise Exception("The chosen id already exists.")
+            else:
+                current_highest_index = 0
+                for id in existing_ids:
+                    if id.isdigit() and int(id) > current_highest_index:
+                        current_highest_index = int(id)
+                copy_credentials_id = str(current_highest_index + 1)
 
-            log.info(content)
+            new_copy_credentials_dict = {
+                copy_credentials_id: {
+                    'target_s3_uri': json['target_s3_uri'],
+                    'iam_access_key_id': json['iam_access_key_id'],
+                    'iam_secret_access_key': json['iam_secret_access_key'],
+                    'expiry_date': 'Not yet implemented'
+                }
+            }
+            copy_dict.update(new_copy_credentials_dict)
 
-            log.info("Copying of dataset initiated. Await email notification.")
+            with open(COPY_FILE, 'w') as f:
+                toml.dump(copy_dict, f)
+
+            if receipt_email:
+                log.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
+            else:
+                log.info(f"Copying of datasett to bucket {json['bucket_name']} initiated.")
+
+    def aws(
+        self,
+        id: str = Argument(..., help="Id of the aws credentials to print."),
+        debug: bool = Option(False, help="Print complete response to console")
+    ) -> None:
+        copy_dict = toml.load(COPY_FILE)
+
+
+# Create command aws, tar inn id , leser iam_acces_key_id og iam_secret_access_key og sender disse til Pawel sin awsprint funksjon
