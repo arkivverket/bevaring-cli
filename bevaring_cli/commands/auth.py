@@ -30,7 +30,7 @@ class AuthCmd(Cmd):
                  "that does not have a browser installed.",
         ),
         endpoint: str = Option('', help=("The endpoint to use for the API. You might also overwrite default with e.g. "
-            "export BEVARING_CLI_ENDPOINT=bevaring.dev.digitalarkivet.no"))
+                                         "export BEVARING_CLI_ENDPOINT=bevaring.dev.digitalarkivet.no"))
     ) -> None:
         """
         Login with Azure AD
