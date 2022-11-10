@@ -6,9 +6,6 @@ readme = "README.md"
 authors = [
   "Ole-Martin Bratteng <olebra@arkivverket.no>",
 ]
-include = [
-  {path = "bevaring_cli/app.toml"}
-]
 
 [tool.poetry.scripts]
 bevaring = "bevaring_cli.main:main"
