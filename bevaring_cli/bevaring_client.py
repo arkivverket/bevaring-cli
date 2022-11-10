@@ -7,7 +7,7 @@ from httpx import Client
 
 from bevaring_cli.auth import Authentication
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -22,7 +22,7 @@ class BevaringClient:
         return Client(
             base_url=f'https://{self.endpoint}/api/',
             headers={'Authorization': f"Bearer {self.auth.get_credentials()['access_token']}"},
-            event_hooks={'request': [lambda req: log.info(f"{req.url}\n{req.headers}\n{req._content}")]}
+            event_hooks={'request': [lambda req: logger.info(f"{req.url}\n{req.headers}\n{req._content}")]}
         )
 
     def __hash__(self) -> int:

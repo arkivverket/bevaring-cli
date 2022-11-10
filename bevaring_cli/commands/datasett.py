@@ -1,4 +1,5 @@
 import logging
+from typing import Any, List
 import toml
 
 from attrs import define
@@ -12,8 +13,10 @@ from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.bevaring_client import BevaringClient
 from bevaring_cli.commands.app import App
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE, COPY_FILE
+from bevaring_cli.config import COPY_FILE
 from bevaring_cli.exceptions import ensure_success
+from bevaring_cli.commands.session import SessionCmd
+aws_export = SessionCmd.aws_export
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +30,13 @@ class DatasettCmd(Cmd):
 
     def __attrs_post_init__(self):
         super().__init__()
-        self.register(self.list, self.checkout, self.copy, self.aws)
+        self.register(self.list, self.copy, self.aws)
         self._main.add(self._app, name='datasett', help='Readonly utility for datasetts.')
 
     def list(
         self,
         limit: int = Option(2, help="Max amount of datasetts to list"),
-        copies: bool = Option(None, help="Lists all locally stored credentials from the copy operation"),
+        copies: bool = Option(None, help="Prints all locally stored credentials from copy operations"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
         if copies:
@@ -87,36 +90,14 @@ class DatasettCmd(Cmd):
         json = response.json()
 
         if 'bucket_name' in json:
-            copy_dict = toml.load(COPY_FILE)
-            existing_ids = []
-
-            for key in copy_dict:
-                existing_ids.append(key)
-
-            if id:
-                if id not in existing_ids:
-                    copy_credentials_id = id
-                else:
-                    raise Exception("The chosen id already exists.")
-            else:
-                current_highest_index = 0
-                for id in existing_ids:
-                    if id.isdigit() and int(id) > current_highest_index:
-                        current_highest_index = int(id)
-                copy_credentials_id = str(current_highest_index + 1)
-
-            new_copy_credentials_dict = {
-                copy_credentials_id: {
-                    'target_s3_uri': json['target_s3_uri'],
-                    'iam_access_key_id': json['iam_access_key_id'],
-                    'iam_secret_access_key': json['iam_secret_access_key'],
-                    'expiry_date': 'Not yet implemented'
-                }
-            }
-            copy_dict.update(new_copy_credentials_dict)
+            copy_file_dict = toml.load(COPY_FILE)
+            existing_ids = list(copy_file_dict.keys())
+            copy_credentials_id = self.get_new_credentials_id(id, existing_ids)
+            new_copy_credentials_dict = self.format_new_copy_credentials_dict(copy_credentials_id, json)
+            copy_file_dict.update(new_copy_credentials_dict)
 
             with open(COPY_FILE, 'w') as f:
-                toml.dump(copy_dict, f)
+                toml.dump(copy_file_dict, f)
 
             if receipt_email:
                 logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
@@ -128,7 +109,35 @@ class DatasettCmd(Cmd):
         id: str = Argument(..., help="Id of the aws credentials to print."),
         debug: bool = Option(False, help="Print complete response to console")
     ) -> None:
-        copy_dict = toml.load(COPY_FILE)
+        try:
+            copy_credentials_dict = toml.load(COPY_FILE)[id]
+            aws_export(copy_credentials_dict['iam_access_key_id'], copy_credentials_dict['iam_secret_access_key'])
+        except Exception:
+            print("The id was not found.")
 
+    @staticmethod
+    def get_new_credentials_id(id: str, existing_ids: List[str]):
+        if id:
+            if id not in existing_ids:
+                copy_credentials_id = id
+            else:
+                raise Exception("The chosen id already exists.")
+        else:
+            current_highest_index = 0
+            for id in existing_ids:
+                if id.isdigit() and int(id) > current_highest_index:
+                    current_highest_index = int(id)
+            copy_credentials_id = str(current_highest_index + 1)
+        return copy_credentials_id
 
-# Create command aws, tar inn id , leser iam_acces_key_id og iam_secret_access_key og sender disse til Pawel sin awsprint funksjon
+    @staticmethod
+    def format_new_copy_credentials_dict(copy_credentials_id: str, json: Any):
+        new_copy_credentials_dict = {
+                copy_credentials_id: {
+                    'target_s3_uri': json['target_s3_uri'],
+                    'iam_access_key_id': json['iam_access_key_id'],
+                    'iam_secret_access_key': json['iam_secret_access_key'],
+                    'expiry_date': 'Not yet implemented'
+                }
+            }
+        return new_copy_credentials_dict
