@@ -9,7 +9,7 @@ from enterprython import component
 from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.auth import Authentication
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -18,8 +18,8 @@ class AuthCmd(Cmd):
     def __init__(self, app: App, auth: Authentication):
         super().__init__()
         self._auth = auth
-        self.register(self.login, self.logout)
-        app.add(self._app, "auth")
+        self.register(self.login, self.logout, self.debug_jwt)
+        app.add(self._app, name='auth', help='Login and logout for bevaring')
 
     def login(
         self,
@@ -29,7 +29,8 @@ class AuthCmd(Cmd):
             help="Use device code flow, suitable for when running the CLI on a machine "
                  "that does not have a browser installed.",
         ),
-        endpoint: str = Option('', help="The endpoint to use for the API")
+        endpoint: str = Option('', help=("The endpoint to use for the API. You might also overwrite default with e.g. "
+                                         "export BEVARING_CLI_ENDPOINT=bevaring.dev.digitalarkivet.no"))
     ) -> None:
         """
         Login with Azure AD
@@ -45,13 +46,13 @@ class AuthCmd(Cmd):
             result = self._auth.login_interactive()
 
         if result:
-            log.info(f"Successfully logged in as [green]{result['username']}[/green]")
+            logger.info(f"Successfully logged in as [green]{result['username']}[/green]")
 
     def logout(self) -> None:
         """
         Logout from Azure AD
         """
-        log.info("Logging out...")
+        logger.info("Logging out...")
         self._auth.logout()
 
     def debug_jwt(

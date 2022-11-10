@@ -1,13 +1,11 @@
 import logging
-import textwrap
 import toml
 
 from attrs import define
-from enterprython import component, setting
+from enterprython import component
 from msal_extensions import FilePersistence
 from rich.console import Console
 from rich.table import Table
-from toml import dump
 from typer import Argument, Option
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
@@ -17,7 +15,7 @@ from bevaring_cli.commands.cmd import Cmd
 from bevaring_cli.config import SESSION_FILE, CREDENTIALS_FILE, COPY_FILE
 from bevaring_cli.exceptions import ensure_success
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -26,16 +24,11 @@ class DatasettCmd(Cmd):
 
     _main: App
     _bevaring: BevaringClient
-    datasett_id: str = setting('DATASETT_ID')
-    session_id: str = setting('SESSION_ID')
-    bucket_name: str = setting('BUCKET_NAME')
-    iam_access_key_id: str = setting('IAM_ACCESS_KEY_ID')
-    iam_secret_access_key: str = setting('IAM_SECRET_ACCESS_KEY')
 
     def __attrs_post_init__(self):
         super().__init__()
         self.register(self.list, self.checkout, self.copy, self.aws)
-        self._main.add(self._app, 'datasett')
+        self._main.add(self._app, name='datasett', help='Readonly utility for datasetts.')
 
     def list(
         self,
@@ -57,55 +50,7 @@ class DatasettCmd(Cmd):
                     datasett['databehandler'],
                     datasett['merkelapp'],
                 )
-
             Console().print(table)
-
-    def checkout(
-        self,
-        datasett_id: str = Argument(..., help="Identifier of the datasett to check out."),
-        email: str = Argument(..., help="Email address where to send progress notification."),
-        empty: bool = Option(True, help="If true check out empty bucket"),
-        debug: bool = Option(False, help="Print complete response to console"),
-        endpoint: str = Option('', help="The endpoint to use for the API")
-    ) -> None:
-        """Checks out given datasett into by default empty bucket. Response will be saved into hidden file."""
-
-        if self.session_id:
-            raise Exception(f"You have an opened session ({self.session_id}). Please close it first.")
-
-        response = self._bevaring().post(
-            url='bevaring/checkout_dataset',
-            json={
-                'client_name': BEVARING_CLI_APP_NAME,
-                'datasett_id': datasett_id,
-                'with_data': not empty,
-                'receipt_email': email
-            }
-        )
-
-        ensure_success(response)
-        json = response.json()
-
-        if 'bucket_name' in json:
-            with open(SESSION_FILE, 'w') as f:
-                dump(json, f)
-            creds = FilePersistence(CREDENTIALS_FILE)
-            creds.save(textwrap.dedent(f"""
-                [default]
-                aws_secret_access_key = {json['iam_access_key_id']}
-                aws_access_key_id = {json['iam_secret_access_key']}
-                """))
-            if debug:
-                table = Table("Datasett ID", "Session ID", "Bucket Name", "IAM Key", "IAM Secret")
-                table.add_row(
-                    json['datasett_id'],
-                    json['session_id'],
-                    json['bucket_name'],
-                    json['iam_access_key_id'],
-                    json['iam_secret_access_key'],
-                )
-                Console().print(table)
-            log.info(f"Creation of the {json['bucket_name']} was triggered. Await email notification.")
 
     def copy(
         self,
@@ -174,9 +119,9 @@ class DatasettCmd(Cmd):
                 toml.dump(copy_dict, f)
 
             if receipt_email:
-                log.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
+                logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
             else:
-                log.info(f"Copying of datasett to bucket {json['bucket_name']} initiated.")
+                logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated.")
 
     def aws(
         self,

@@ -6,12 +6,9 @@ readme = "README.md"
 authors = [
   "Ole-Martin Bratteng <olebra@arkivverket.no>",
 ]
-include = [
-  {path = "app.toml"}
-]
 
 [tool.poetry.scripts]
-bevaring = "bevaring_cli.main:app"
+bevaring = "bevaring_cli.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -20,6 +17,8 @@ msal = "^1.18.0"
 msal-extensions = "^1.0.0"
 httpx = "^0.23.0"
 enterprython = "^0.7.0"
+toml = "^0.10.2"
+attrs = "^22.1.0"
 
 [tool.poetry.dev-dependencies]
 python-dotenv = "^0.21.0"

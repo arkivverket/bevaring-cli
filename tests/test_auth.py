@@ -8,7 +8,7 @@ from bevaring_cli.exceptions import AuthenticationError
 
 
 def auth_prod() -> AuthenticationProd:
-    load_config(app_name='test', paths=['app.toml'])
+    load_config(app_name='test', paths=['bevaring_cli/app.toml'])
     auth = assemble(AuthenticationProd)
     # Remove Prod version from container such that it will not conflict with the mock used in other tests.
     # This is only needed due to bug in Enterprython where profiles are not working correctly.
@@ -20,9 +20,8 @@ def test_auth():
     auth = auth_prod()
 
     assert auth._msal_app_instance is None
-    assert auth.client_id == "d18685f9-148d-4e9a-98b3-194bcd01bc95"
     assert auth.authority == "https://login.microsoftonline.com/organizations"
-    assert auth.scopes == ["https://bevaring.dev.digitalarkivet.no/User.Login"]
+    assert auth.scopes == ["https://bevaring.digitalarkivet.no/User.Login"]
 
     assert auth._msal_app_kwargs["authority"] == "https://login.microsoftonline.com/organizations"
     assert auth._msal_app_kwargs["app_name"] == "bevaring-cli"

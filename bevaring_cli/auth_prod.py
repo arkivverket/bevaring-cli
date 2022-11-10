@@ -1,4 +1,5 @@
 import logging
+from sys import stdout
 
 import msal
 from attrs import define
@@ -10,10 +11,13 @@ from bevaring_cli import (
     __version__,
 )
 from bevaring_cli.auth import Authentication
-from bevaring_cli.config import CONFIG_DIR
+from bevaring_cli.config import CONFIG_DIR, DEFAULTS
 from bevaring_cli.exceptions import AuthenticationError
 
-log = logging.getLogger(__name__)
+ENDPOINT = 'ENDPOINT'
+CLIENT_ID = 'd18685f9-148d-4e9a-98b3-194bcd01bc95'
+
+logger = logging.getLogger(__name__)
 
 
 @component()
@@ -24,8 +28,7 @@ class AuthenticationProd(Authentication):
     """
     _msal_app_instance = None
 
-    client_id: str = setting('CLIENT_ID')
-    endpoint: str = setting('ENDPOINT')
+    endpoint: str = setting(ENDPOINT)
 
     def __attrs_post_init__(self) -> None:
         self.authority = "https://login.microsoftonline.com/organizations"
@@ -46,9 +49,10 @@ class AuthenticationProd(Authentication):
         """
         Returns the MSAL application object
         """
+        if DEFAULTS[ENDPOINT.lower()] != self.endpoint and stdout.isatty():
+            logger.warning("Setting endpoint to [green]%s[/green]", self.endpoint)
         if not self._msal_app_instance:
-            self._msal_app_instance = msal.PublicClientApplication(client_id=self.client_id,
-                                                                   **self._msal_app_kwargs)
+            self._msal_app_instance = msal.PublicClientApplication(client_id=CLIENT_ID, **self._msal_app_kwargs)
 
         return self._msal_app_instance
 
@@ -56,11 +60,11 @@ class AuthenticationProd(Authentication):
         """
         Acquires a token for the application
         """
-        log.info("A web browser has been opened at "
-                 "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
-        log.info("Please continue the login in the web browser. "
-                 "If no web browser is available or if the web browser fails to open, "
-                 "use device code flow with `bevaring auth login --use-device-code`.")
+        logger.info("A web browser has been opened at "
+                    "https://login.microsoftonline.com/organizations/oauth2/v2.0/authorize.")
+        logger.info("Please continue the login in the web browser. "
+                    "If no web browser is available or if the web browser fails to open, "
+                    "use device code flow with `bevaring auth login --use-device-code`.")
 
         result = self._msal_app.acquire_token_interactive(scopes=self.scopes)
         return Authentication.validate_result(result)
@@ -73,7 +77,7 @@ class AuthenticationProd(Authentication):
         if "user_code" not in flow:
             raise ValueError("Could not initiate device flow")
 
-        log.info(
+        logger.info(
             f"To sign in, use a web browser to open the page {flow['verification_uri']} and "
             "enter the code [bold green]{flow['user_code']}[/bold green] to authenticate."
         )
@@ -90,7 +94,7 @@ class AuthenticationProd(Authentication):
     def get_credentials(self) -> dict:
         accounts = self._msal_app.get_accounts()
         if not accounts:
-            log.error("[red]Not logged in, please login[/red]")
+            logger.error("[red]Not logged in, please login[/red]")
             raise AuthenticationError()
 
         # We only support one account at the moment

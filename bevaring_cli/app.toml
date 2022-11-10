@@ -1,6 +1,5 @@
 
-client_id = 'd18685f9-148d-4e9a-98b3-194bcd01bc95'
-endpoint = 'bevaring.dev.digitalarkivet.no'
+endpoint = 'bevaring.digitalarkivet.no'
 
 # Only defaults here. Will be overwritten in session.toml
 datasett_id = ''

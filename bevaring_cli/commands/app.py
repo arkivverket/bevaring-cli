@@ -4,7 +4,7 @@ from bevaring_cli import BEVARING_CLI_APP_NAME, __version__
 from bevaring_cli.commands.cmd import Cmd
 from enterprython import component
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 VERSION = f"{BEVARING_CLI_APP_NAME} version {__version__}"
 
@@ -19,4 +19,4 @@ class App(Cmd):
     @staticmethod
     def version() -> None:
         """Prints the version"""
-        log.info(VERSION)
+        logger.info(VERSION)
