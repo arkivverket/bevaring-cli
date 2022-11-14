@@ -1,38 +1,43 @@
-import typer
+import logging
 
-from bevaring_cli.auth import Authentication
-from bevaring_cli.utils import state
+from attrs import define
+from enterprython import component
+from rich.console import Console
+from rich.table import Table
+from typer import Option
 
-app = typer.Typer()
+from bevaring_cli.bevaring_client import BevaringClient
+from bevaring_cli.commands.app import App
+from bevaring_cli.commands.cmd import Cmd
+
+logger = logging.getLogger(__name__)
 
 
-@app.callback()
-def main(ctx: typer.Context) -> None:
-    if ctx.invoked_subcommand != 'login':
-        state["credentials"] = Authentication().get_credentials()
+@component()
+@define(slots=False)
+class DatasettCmd(Cmd):
 
+    _main: App
+    _bevaring: BevaringClient
 
-@app.command()
-def list() -> None:
-    import httpx
-    from rich.console import Console
-    from rich.table import Table
-    console = Console()
+    def __attrs_post_init__(self):
+        super().__init__()
+        self.register(self.list)
+        self._main.add(self._app, name='datasett', help='Readonly utility for datasetts.')
 
-    # Calling graph using the access token
-    response = httpx.get(
-        url=f"https://{state['endpoint']}/api/metadata/datasett?limit=2",
-        headers={
-            "Authorization": f"Bearer {state['credentials']['access_token']}",
-        },
-    )
+    def list(
+        self,
+        limit: int = Option(2, help="Max amount of datasets to list"),
+        endpoint: str = Option('', help="The endpoint to use for the API")
+    ) -> None:
+        response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
-    table = Table("Datasett ID", "Databehandler", "Merkelapp")
-    for dataset in response.json()["result"]:
-        table.add_row(
-            dataset["datasett_id"],
-            dataset["databehandler"],
-            dataset["merkelapp"],
-        )
+        table = Table("Datasett ID", "Databehandler", "Merkelapp")
+        for dataset in response.json()['result']:
+            table.add_row(
+                dataset['datasett_id'],
+                dataset['databehandler'],
+                dataset['merkelapp'],
+            )
 
-    console.print(table)
+        Console().print(table)

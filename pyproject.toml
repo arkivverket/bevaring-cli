@@ -8,7 +8,7 @@ authors = [
 ]
 
 [tool.poetry.scripts]
-bevaring = "bevaring_cli.main:app"
+bevaring = "bevaring_cli.main:main"
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -16,6 +16,9 @@ typer = {extras = ["all"], version = "^0.6.1"}
 msal = "^1.18.0"
 msal-extensions = "^1.0.0"
 httpx = "^0.23.0"
+enterprython = "^0.7.0"
+toml = "^0.10.2"
+attrs = "^22.1.0"
 
 [tool.poetry.dev-dependencies]
 python-dotenv = "^0.21.0"
@@ -25,6 +28,9 @@ mypy = "^0.971"
 pytest = "^7.1.3"
 # INFO: This should be replaced with the upstream version, when https://github.com/tiangolo/typer-cli/pull/67 is merged
 typer-cli = {git = "https://github.com/cdcadman/typer-cli", rev = "78df55c"}
+
+[tool.poetry.group.dev.dependencies]
+pytest-httpx = "^0.21.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

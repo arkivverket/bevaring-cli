@@ -1,0 +1,9 @@
+
+endpoint = 'bevaring.digitalarkivet.no'
+
+# Only defaults here. Will be overwritten in session.toml
+datasett_id = ''
+session_id = ''
+bucket_name = ''
+iam_access_key_id = ''
+iam_secret_access_key = ''
