@@ -5,7 +5,6 @@ from typing import Any, List
 
 from attrs import define
 from enterprython import component
-from msal_extensions import FilePersistence
 from rich.console import Console
 from rich.table import Table
 from typer import Argument, Option
