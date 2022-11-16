@@ -90,7 +90,7 @@ def test_list_copies_returns_output_as_expected(
     runner.invoke(app('test')._app, command_input)
     actual = runner.invoke(app('test')._app, command_input_print_copy_file)
 
-    expected = '[1]\ntarget_s3_uri = "s3://bn/di/ip0"\niam_access_key_id = "ik"\niam_secret_access_key = "is"\nexpiry_date = "Not yet implemented"\n\n'
+    expected = '\n[1]\ntarget_s3_uri = "s3://bn/di/ip0"\n\n'
 
     assert actual.output == expected
 
