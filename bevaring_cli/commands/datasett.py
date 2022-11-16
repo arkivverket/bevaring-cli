@@ -137,13 +137,13 @@ class DatasettCmd(Cmd):
     @staticmethod
     def format_new_copy_credentials_dict(copy_credentials_id: str, json: Any):
         new_copy_credentials_dict = {
-                copy_credentials_id: {
-                    'target_s3_uri': json['target_s3_uri'],
-                    'iam_access_key_id': json['iam_access_key_id'],
-                    'iam_secret_access_key': json['iam_secret_access_key'],
-                    'expiry_date': 'Not yet implemented'
-                }
+            copy_credentials_id: {
+                'target_s3_uri': json['target_s3_uri'],
+                'iam_access_key_id': json['iam_access_key_id'],
+                'iam_secret_access_key': json['iam_secret_access_key'],
+                'expiry_date': 'Not yet implemented'
             }
+        }
         return new_copy_credentials_dict
 
     @staticmethod
