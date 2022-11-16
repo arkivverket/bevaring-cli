@@ -1,5 +1,6 @@
 from genericpath import isfile
 import logging
+from textwrap import dedent
 from typing import Any, List
 
 from attrs import define
@@ -42,9 +43,12 @@ class DatasettCmd(Cmd):
     ) -> None:
         if copies:
             if isfile(COPY_FILE):
-                copy_credentials = FilePersistence(COPY_FILE)
-                content = copy_credentials.load()
-                print(content)
+                copy_credentials_dict = load(COPY_FILE)
+                for key in copy_credentials_dict:
+                    print(dedent(f"""
+                        [{key}]
+                        target_s3_uri = "{copy_credentials_dict[key]['target_s3_uri']}"
+                    """))
             else:
                 raise FileNotFoundError("No copy credentials file exists.")
         else:
@@ -70,13 +74,11 @@ class DatasettCmd(Cmd):
         s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied."),
         generation_name: str = Option(None, help="Which generation to copy."),
         receipt_email: str = Option(None, help="Email address for progress notification."),
-        debug: bool = Option(False, help="Print complete response to console"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(
-            # temp url for local testing
-            url='http://localhost:8000/bevaring/copy_dataset',
+            url='bevaring/copy_dataset',
             json={
                 'client_name': BEVARING_CLI_APP_NAME,
                 'datasett_id': datasett_id,
@@ -89,10 +91,8 @@ class DatasettCmd(Cmd):
                 'receipt_email': receipt_email
             }
         )
-
         ensure_success(response)
         json = response.json()
-        print(json)
 
         if isfile(COPY_FILE):
             copy_file_dict = load(COPY_FILE)
@@ -111,8 +111,7 @@ class DatasettCmd(Cmd):
 
     def aws(
         self,
-        id: str = Argument(..., help="Id of the aws credentials to print."),
-        debug: bool = Option(False, help="Print complete response to console.")
+        id: str = Argument(..., help="Id of the aws credentials to print.")
     ) -> None:
         try:
             copy_credentials_dict = load(COPY_FILE)[id]
