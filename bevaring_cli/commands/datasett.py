@@ -1,6 +1,6 @@
+from genericpath import isfile
 import logging
 from typing import Any, List
-import toml
 
 from attrs import define
 from enterprython import component
@@ -8,6 +8,7 @@ from msal_extensions import FilePersistence
 from rich.console import Console
 from rich.table import Table
 from typer import Argument, Option
+from toml import load, dump
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.bevaring_client import BevaringClient
@@ -40,9 +41,12 @@ class DatasettCmd(Cmd):
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
         if copies:
-            copy_credentials = FilePersistence(COPY_FILE)
-            content = copy_credentials.load()
-            print(content)
+            if isfile(COPY_FILE):
+                copy_credentials = FilePersistence(COPY_FILE)
+                content = copy_credentials.load()
+                print(content)
+            else:
+                raise FileNotFoundError("No copy credentials file exists.")
         else:
             response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
@@ -88,32 +92,34 @@ class DatasettCmd(Cmd):
 
         ensure_success(response)
         json = response.json()
+        print(json)
 
-        if 'bucket_name' in json:
-            copy_file_dict = toml.load(COPY_FILE)
-            existing_ids = list(copy_file_dict.keys())
-            copy_credentials_id = self.get_new_credentials_id(id, existing_ids)
-            new_copy_credentials_dict = self.format_new_copy_credentials_dict(copy_credentials_id, json)
-            copy_file_dict.update(new_copy_credentials_dict)
+        if isfile(COPY_FILE):
+            copy_file_dict = load(COPY_FILE)
+        else:
+            copy_file_dict = {}
+        existing_ids = list(copy_file_dict.keys())
+        copy_credentials_id = self.get_new_credentials_id(id, existing_ids)
+        new_copy_credentials_dict = self.format_new_copy_credentials_dict(copy_credentials_id, json)
+        copy_file_dict.update(new_copy_credentials_dict)
+        self.persist(copy_file_dict)
 
-            with open(COPY_FILE, 'w') as f:
-                toml.dump(copy_file_dict, f)
-
-            if receipt_email:
-                logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
-            else:
-                logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated.")
+        if receipt_email:
+            logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
+        else:
+            logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated.")
 
     def aws(
         self,
         id: str = Argument(..., help="Id of the aws credentials to print."),
-        debug: bool = Option(False, help="Print complete response to console")
+        debug: bool = Option(False, help="Print complete response to console.")
     ) -> None:
         try:
-            copy_credentials_dict = toml.load(COPY_FILE)[id]
+            copy_credentials_dict = load(COPY_FILE)[id]
             aws_export(copy_credentials_dict['iam_access_key_id'], copy_credentials_dict['iam_secret_access_key'])
-        except Exception:
+        except KeyError:
             print("The id was not found.")
+            raise
 
     @staticmethod
     def get_new_credentials_id(id: str, existing_ids: List[str]):
@@ -121,7 +127,7 @@ class DatasettCmd(Cmd):
             if id not in existing_ids:
                 copy_credentials_id = id
             else:
-                raise Exception("The chosen id already exists.")
+                raise KeyError("The id already exists.")
         else:
             current_highest_index = 0
             for id in existing_ids:
@@ -141,3 +147,8 @@ class DatasettCmd(Cmd):
                 }
             }
         return new_copy_credentials_dict
+
+    @staticmethod
+    def persist(copy_file_dict: dict) -> None:
+        with open(COPY_FILE, 'w') as f:
+            dump(copy_file_dict, f)
