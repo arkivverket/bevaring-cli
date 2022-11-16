@@ -1,4 +1,3 @@
-import logging
 from functools import cache
 
 from attrs import define
@@ -7,11 +6,9 @@ from httpx import Client
 
 from bevaring_cli.auth import Authentication
 
-logger = logging.getLogger(__name__)
-
 
 @component()
-@define
+@define(hash=True)
 class BevaringClient:
     """Lazily initialized Bevaring rest API client. Contains authorization headers."""
     auth: Authentication
@@ -21,9 +18,5 @@ class BevaringClient:
     def __call__(self) -> Client:
         return Client(
             base_url=f'https://{self.endpoint}/api/',
-            headers={'Authorization': f"Bearer {self.auth.get_credentials()['access_token']}"},
-            event_hooks={'request': [lambda req: logger.info(f"{req.url}\n{req.headers}\n{req._content}")]}
+            headers={'Authorization': f"Bearer {self.auth.get_credentials()['access_token']}"}
         )
-
-    def __hash__(self) -> int:
-        return hash(self.endpoint) + hash(self.auth)

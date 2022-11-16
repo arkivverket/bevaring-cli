@@ -9,5 +9,4 @@ CONFIG_DIR = get_app_dir(app_name=BEVARING_CLI_APP_NAME)
 makedirs(CONFIG_DIR, exist_ok=True)
 SESSION_FILE = f"{CONFIG_DIR}/session.toml"
 COPY_FILE = f"{CONFIG_DIR}/copy.toml"
-CREDENTIALS_FILE = '~/.aws/credentials'
 DEFAULTS: Dict[str, str] = {}

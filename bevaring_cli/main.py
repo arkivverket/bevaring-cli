@@ -13,7 +13,7 @@ from rich.logging import RichHandler
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import COPY_FILE, CREDENTIALS_FILE, SESSION_FILE, CONFIG_DIR, DEFAULTS
+from bevaring_cli.config import SESSION_FILE, CONFIG_DIR, DEFAULTS
 
 from glob import glob
 
