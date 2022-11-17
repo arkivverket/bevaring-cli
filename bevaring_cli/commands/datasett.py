@@ -91,10 +91,10 @@ class DatasettCmd(Cmd):
             copies = {}
         existing_ids = list(copies.keys())
         copies[self.next_id(id, existing_ids)] = {
-                'target_s3_uri': json['target_s3_uri'],
-                'iam_access_key_id': json['iam_access_key_id'],
-                'iam_secret_access_key': json['iam_secret_access_key']
-            }
+            'target_s3_uri': json['target_s3_uri'],
+            'iam_access_key_id': json['iam_access_key_id'],
+            'iam_secret_access_key': json['iam_secret_access_key']
+        }
         self.persist(copies)
 
         if receipt_email:
