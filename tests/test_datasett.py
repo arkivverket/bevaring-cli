@@ -25,12 +25,12 @@ def test_copy_saves_credentials_as_expected(
     httpx_mock: HTTPXMock,
     copy_response,
     command_input_id,
-    expected_creds
+    expected_creds,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response
+        json=copy_response,
     )
     runner.invoke(app('test')._app, command_input_id)
     actual = load(COPY_FILE)['test1']
@@ -42,12 +42,12 @@ def test_copy_saves_credentials_with_s3_path_as_expected(
     httpx_mock: HTTPXMock,
     copy_response_with_s3_path,
     command_input_id_with_s3_path,
-    expected_creds_with_s3_path
+    expected_creds_with_s3_path,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response_with_s3_path
+        json=copy_response_with_s3_path,
     )
     runner.invoke(app('test')._app, command_input_id_with_s3_path)
     actual = load(COPY_FILE)['test2']
@@ -58,12 +58,12 @@ def test_copy_saves_credentials_with_s3_path_as_expected(
 def test_copy_saves_credentials_with_incremental_indexing_as_expected(
     httpx_mock: HTTPXMock,
     copy_response,
-    command_input_index_increment_test
+    command_input_index_increment_test,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response
+        json=copy_response,
     )
     runner.invoke(app('test')._app, command_input_index_increment_test)
     runner.invoke(app('test')._app, command_input_index_increment_test)
@@ -79,12 +79,12 @@ def test_list_copies_returns_output_as_expected(
     httpx_mock: HTTPXMock,
     copy_response,
     command_input,
-    command_input_print_copies_file
+    command_input_print_copies_file,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response
+        json=copy_response,
     )
 
     runner.invoke(app('test')._app, command_input)
@@ -106,12 +106,12 @@ def test_list_copies_informs_user_when_no_copies_file_exists(command_input_print
 def test_copy_raises_KeyError_when_id_already_exists(
     httpx_mock: HTTPXMock,
     copy_response,
-    command_input_id
+    command_input_id,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response
+        json=copy_response,
     )
     runner.invoke(app('test')._app, command_input_id)
     result = runner.invoke(app('test')._app, command_input_id)
@@ -123,12 +123,12 @@ def test_aws_export_prints_creds_as_expected(
     httpx_mock: HTTPXMock,
     copy_response,
     command_input_id,
-    command_input_aws_export
+    command_input_aws_export,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response
+        json=copy_response,
     )
     runner.invoke(app('test')._app, command_input_id)
     actual = runner.invoke(app('test')._app, command_input_aws_export)
@@ -142,12 +142,12 @@ def test_aws_export_raises_KeyError_when_id_not_found(
     httpx_mock: HTTPXMock,
     copy_response,
     command_input_id,
-    command_input_aws_export_id_not_found
+    command_input_aws_export_id_not_found,
 ):
     httpx_mock.add_response(
         method='POST',
         url=re.compile('^.*bevaring/copy_dataset.*$'),
-        json=copy_response
+        json=copy_response,
     )
     runner.invoke(app('test')._app, command_input_id)
     result = runner.invoke(app('test')._app, command_input_aws_export_id_not_found)

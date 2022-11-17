@@ -66,7 +66,7 @@ class DatasettCmd(Cmd):
         s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied"),
         generation_name: str = Option(None, help="Which generation to copy"),
         receipt_email: str = Option(None, help="Email address for progress notifications"),
-        endpoint: str = Option('', help="The endpoint to use for the API. Default is bevaring.digitalarkivet.no")
+        endpoint: str = Option('', help="The endpoint to use for the API. Default is bevaring.digitalarkivet.no"),
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(
@@ -79,7 +79,7 @@ class DatasettCmd(Cmd):
                 'iam_secret_access_key': iam_secret_access_key,
                 's3_path': s3_path,
                 'generation_name': generation_name,
-                'receipt_email': receipt_email
+                'receipt_email': receipt_email,
             }
         )
         ensure_success(response)
@@ -93,7 +93,7 @@ class DatasettCmd(Cmd):
         copies[self.next_id(id, existing_ids)] = {
             'target_s3_uri': json['target_s3_uri'],
             'iam_access_key_id': json['iam_access_key_id'],
-            'iam_secret_access_key': json['iam_secret_access_key']
+            'iam_secret_access_key': json['iam_secret_access_key'],
         }
         self.persist(copies)
 
@@ -104,7 +104,7 @@ class DatasettCmd(Cmd):
 
     def aws(
         self,
-        id: str = Argument(..., help="Id of the aws credentials to print")
+        id: str = Argument(..., help="Id of the aws credentials to print"),
     ) -> None:
         try:
             copy = load(COPY_FILE)[id]
