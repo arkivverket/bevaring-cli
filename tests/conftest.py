@@ -78,7 +78,6 @@ def expected_creds():
         'target_s3_uri': 's3://bn/di/ip0',
         'iam_access_key_id': 'ik',
         'iam_secret_access_key': 'is',
-        'expiry_date': 'Not yet implemented',
     }
 
 
@@ -88,7 +87,6 @@ def expected_creds_with_s3_path():
         'target_s3_uri': 's3://bn/sp/di/ip0',
         'iam_access_key_id': 'ik',
         'iam_secret_access_key': 'is',
-        'expiry_date': 'Not yet implemented',
     }
 
 
@@ -117,7 +115,6 @@ def command_input_id_with_s3_path():
         "datasett",
         "copy",
         "123",
-        "True",
         "--id=test2",
         "--bucket-name=bn",
         "--iam-access-key-id=ik",
@@ -138,11 +135,10 @@ def command_input_index_increment_test():
 
 
 @pytest.fixture
-def command_input_print_copy_file():
+def command_input_print_copies_file():
     return [
         "datasett",
-        "list",
-        "--copies",
+        "copies",
     ]
 
 

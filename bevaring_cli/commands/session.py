@@ -35,12 +35,12 @@ class SessionCmd(Cmd):
     def __attrs_post_init__(self):
         super().__init__()
         self.register(self.checkout, self.aws)
-        self._main.add(self._app, name='session', help="Manages process of new generation creation.")
+        self._main.add(self._app, name='session', help="Manages process of new generation creation")
 
     def checkout(
         self,
-        datasett_id: str = Argument(..., help="Identifier of the dataset to check out."),
-        email: str = Argument(..., help="Email address where to send progress notification."),
+        datasett_id: str = Argument(..., help="Identifier of the dataset to check out"),
+        email: str = Argument(..., help="Email address where to send progress notification"),
         empty: bool = Option(True, help="If true check out empty bucket"),
         debug: bool = Option(False, help="Print complete response to console"),
         endpoint: str = Option('', help="The endpoint to use for the API")

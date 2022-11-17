@@ -79,7 +79,7 @@ def test_list_copies_returns_output_as_expected(
     httpx_mock: HTTPXMock,
     copy_response,
     command_input,
-    command_input_print_copy_file
+    command_input_print_copies_file
 ):
     httpx_mock.add_response(
         method='POST',
@@ -88,17 +88,19 @@ def test_list_copies_returns_output_as_expected(
     )
 
     runner.invoke(app('test')._app, command_input)
-    actual = runner.invoke(app('test')._app, command_input_print_copy_file)
+    actual = runner.invoke(app('test')._app, command_input_print_copies_file)
 
-    expected = '\n[1]\ntarget_s3_uri = "s3://bn/di/ip0"\n\n'
+    expected = 'id: 1\ttarget_s3_uri: s3://bn/di/ip0\n'
 
     assert actual.output == expected
 
 
-def test_list_copies_raises_FileNotFoundError_when_no_file_exists(command_input_print_copy_file):
-    result = runner.invoke(app('test')._app, command_input_print_copy_file)
+def test_list_copies_informs_user_when_no_copies_file_exists(command_input_print_copies_file):
+    actual = runner.invoke(app('test')._app, command_input_print_copies_file)
 
-    assert result.exception.__class__ == FileNotFoundError
+    expected = 'No copy credentials file exists since no copies have been created yet.\n'
+
+    assert actual.output == expected
 
 
 def test_copy_raises_KeyError_when_id_already_exists(

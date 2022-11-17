@@ -1,8 +1,7 @@
-from genericpath import isfile
 import logging
-from textwrap import dedent
-from typing import Any, List
 
+from genericpath import isfile
+from typing import List
 from attrs import define
 from enterprython import component
 from rich.console import Console
@@ -31,57 +30,51 @@ class DatasettCmd(Cmd):
 
     def __attrs_post_init__(self):
         super().__init__()
-        self.register(self.list, self.copy, self.aws)
-        self._main.add(self._app, name='datasett', help='Readonly utility for datasetts.')
+        self.register(self.list, self.copies, self.copy, self.aws)
+        self._main.add(self._app, name='datasett', help='Readonly utility for datasetts')
 
     def list(
         self,
         limit: int = Option(2, help="Max amount of datasetts to list"),
-        copies: bool = Option(None, help="Prints all locally stored credentials from copy operations"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
-        if copies:
-            if isfile(COPY_FILE):
-                copy_credentials_dict = load(COPY_FILE)
-                for key in copy_credentials_dict:
-                    print(dedent(f"""
-                        [{key}]
-                        target_s3_uri = "{copy_credentials_dict[key]['target_s3_uri']}"
-                    """))
-            else:
-                raise FileNotFoundError("No copy credentials file exists.")
-        else:
-            response = self._bevaring().get(f'metadata/datasett?limit={limit}')
+        response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
-            table = Table("Datasett ID", "Databehandler", "Merkelapp")
-            for datasett in response.json()['result']:
-                table.add_row(
-                    datasett['datasett_id'],
-                    datasett['databehandler'],
-                    datasett['merkelapp'],
-                )
-            Console().print(table)
+        table = Table("Datasett ID", "Databehandler", "Merkelapp")
+        for datasett in response.json()['result']:
+            table.add_row(
+                datasett['datasett_id'],
+                datasett['databehandler'],
+                datasett['merkelapp'],
+            )
+        Console().print(table)
+
+    def copies(self):
+        """Prints all locally stored credentials from copy operations."""
+        if isfile(COPY_FILE):
+            print("\n".join("id: {}\ttarget_s3_uri: {}".format(key, value['target_s3_uri']) for (key, value) in load(COPY_FILE).items()))
+        else:
+            print("No copy credentials file exists since no copies have been created yet.")
 
     def copy(
         self,
-        datasett_id: str = Argument(..., help="Identifier of the datasett to copy."),
-        user_has_bucket: bool = Argument(False, help="If user has a target bucket to copy to."),
-        id: str = Option(None, help="User defined id for locally stored credentials."),
-        bucket_name: str = Option(None, help="Name of the target bucket."),
-        iam_access_key_id: str = Option(None, help="IAM acces key id if user has a bucket."),
-        iam_secret_access_key: str = Option(None, help="IAM secret access key if user has a bucket."),
-        s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied."),
-        generation_name: str = Option(None, help="Which generation to copy."),
-        receipt_email: str = Option(None, help="Email address for progress notification."),
+        datasett_id: str = Argument(..., help="Identifier of the datasett to copy"),
+        id: str = Option(None, help="User defined id for locally stored credentials"),
+        bucket_name: str = Option(None, help="Name of the target bucket. If not specified a temporary bucket will be created"),
+        iam_access_key_id: str = Option(None, help="IAM acces key id if user has a bucket"),
+        iam_secret_access_key: str = Option(None, help="IAM secret access key if user has a bucket"),
+        s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied"),
+        generation_name: str = Option(None, help="Which generation to copy"),
+        receipt_email: str = Option(None, help="Email address for progress notifications"),
         endpoint: str = Option('', help="The endpoint to use for the API")
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(
-            url='bevaring/copy_dataset',
+            # http://localhost:8000/
+            url='http://localhost:8000/bevaring/copy_dataset',
             json={
                 'client_name': BEVARING_CLI_APP_NAME,
                 'datasett_id': datasett_id,
-                'user_has_bucket': user_has_bucket,
                 'bucket_name': bucket_name,
                 'iam_access_key_id': iam_access_key_id,
                 'iam_secret_access_key': iam_secret_access_key,
@@ -94,14 +87,16 @@ class DatasettCmd(Cmd):
         json = response.json()
 
         if isfile(COPY_FILE):
-            copy_file_dict = load(COPY_FILE)
+            copies = load(COPY_FILE)
         else:
-            copy_file_dict = {}
-        existing_ids = list(copy_file_dict.keys())
-        copy_credentials_id = self.get_new_credentials_id(id, existing_ids)
-        new_copy_credentials_dict = self.format_new_copy_credentials_dict(copy_credentials_id, json)
-        copy_file_dict.update(new_copy_credentials_dict)
-        self.persist(copy_file_dict)
+            copies = {}
+        existing_ids = list(copies.keys())
+        copies[self.next_id(id, existing_ids)] = {
+                'target_s3_uri': json['target_s3_uri'],
+                'iam_access_key_id': json['iam_access_key_id'],
+                'iam_secret_access_key': json['iam_secret_access_key']
+            }
+        self.persist(copies)
 
         if receipt_email:
             logger.info(f"Copying of datasett to bucket {json['bucket_name']} initiated. Await email notification.")
@@ -110,43 +105,29 @@ class DatasettCmd(Cmd):
 
     def aws(
         self,
-        id: str = Argument(..., help="Id of the aws credentials to print.")
+        id: str = Argument(..., help="Id of the aws credentials to print")
     ) -> None:
         try:
-            copy_credentials_dict = load(COPY_FILE)[id]
-            aws_export(copy_credentials_dict['iam_access_key_id'], copy_credentials_dict['iam_secret_access_key'])
+            copy = load(COPY_FILE)[id]
+            aws_export(copy['iam_access_key_id'], copy['iam_secret_access_key'])
         except KeyError:
             print("The id was not found.")
             raise
 
     @staticmethod
-    def get_new_credentials_id(id: str, existing_ids: List[str]):
+    def next_id(id: str, existing_ids: List[str]):
         if id:
             if id not in existing_ids:
-                copy_credentials_id = id
+                return id
             else:
                 raise KeyError("The id already exists.")
         else:
-            current_highest_index = 0
-            for id in existing_ids:
-                if id.isdigit() and int(id) > current_highest_index:
-                    current_highest_index = int(id)
-            copy_credentials_id = str(current_highest_index + 1)
-        return copy_credentials_id
+            next_id = 1
+            while str(next_id) in existing_ids:
+                next_id += 1
+        return str(next_id)
 
     @staticmethod
-    def format_new_copy_credentials_dict(copy_credentials_id: str, json: Any):
-        new_copy_credentials_dict = {
-            copy_credentials_id: {
-                'target_s3_uri': json['target_s3_uri'],
-                'iam_access_key_id': json['iam_access_key_id'],
-                'iam_secret_access_key': json['iam_secret_access_key'],
-                'expiry_date': 'Not yet implemented'
-            }
-        }
-        return new_copy_credentials_dict
-
-    @staticmethod
-    def persist(copy_file_dict: dict) -> None:
+    def persist(copies: dict) -> None:
         with open(COPY_FILE, 'w') as f:
-            dump(copy_file_dict, f)
+            dump(copies, f)
