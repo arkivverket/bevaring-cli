@@ -61,12 +61,12 @@ class DatasettCmd(Cmd):
         datasett_id: str = Argument(..., help="Identifier of the datasett to copy"),
         id: str = Option(None, help="User defined id for locally stored credentials"),
         bucket_name: str = Option(None, help="Name of the target bucket. If not specified a temporary bucket will be created"),
-        iam_access_key_id: str = Option(None, help="IAM acces key id if user has a bucket"),
+        iam_access_key_id: str = Option(None, help="IAM access key id if user has a bucket"),
         iam_secret_access_key: str = Option(None, help="IAM secret access key if user has a bucket"),
         s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied"),
         generation_name: str = Option(None, help="Which generation to copy"),
         receipt_email: str = Option(None, help="Email address for progress notifications"),
-        endpoint: str = Option('', help="The endpoint to use for the API")
+        endpoint: str = Option('', help="The endpoint to use for the API. Default is bevaring.digitalarkivet.no")
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(

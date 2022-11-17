@@ -43,7 +43,7 @@ class SessionCmd(Cmd):
         email: str = Argument(..., help="Email address where to send progress notification"),
         empty: bool = Option(True, help="If true check out empty bucket"),
         debug: bool = Option(False, help="Print complete response to console"),
-        endpoint: str = Option('', help="The endpoint to use for the API")
+        endpoint: str = Option('', help="The endpoint to use for the API. Default is bevaring.digitalarkivet.no")
     ) -> None:
         """Checks out given dataset into by default empty bucket. Response will be persisted for later use."""
         response = self.request_checkout(datasett_id, email, empty)
