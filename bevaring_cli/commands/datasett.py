@@ -70,8 +70,7 @@ class DatasettCmd(Cmd):
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(
-            # http://localhost:8000/
-            url='http://localhost:8000/bevaring/copy_dataset',
+            url='bevaring/copy_dataset',
             json={
                 'client_name': BEVARING_CLI_APP_NAME,
                 'datasett_id': datasett_id,
