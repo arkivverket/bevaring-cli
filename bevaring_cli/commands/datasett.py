@@ -4,6 +4,7 @@ from genericpath import isfile
 from typing import List
 from attrs import define
 from enterprython import component
+from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from rich.console import Console
 from rich.table import Table
 from typer import Argument, Option
@@ -36,7 +37,7 @@ class DatasettCmd(Cmd):
     def list(
         self,
         limit: int = Option(2, help="Max amount of datasetts to list"),
-        endpoint: str = Option('', help="The endpoint to use for the API")
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
     ) -> None:
         response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
@@ -66,7 +67,7 @@ class DatasettCmd(Cmd):
         s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied"),
         generation_name: str = Option(None, help="Which generation to copy"),
         receipt_email: str = Option(None, help="Email address for progress notifications"),
-        endpoint: str = Option('', help="The endpoint to use for the API. Default is bevaring.digitalarkivet.no"),
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(

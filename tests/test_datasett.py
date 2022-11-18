@@ -1,7 +1,6 @@
-from os import path
-import os
 import re
 
+from os import path, remove
 from pytest_httpx import HTTPXMock
 from typer.testing import CliRunner
 from toml import load
@@ -18,7 +17,7 @@ def setup_function():
 
 def teardown_function():
     if path.exists(COPY_FILE):
-        os.remove(COPY_FILE)
+        remove(COPY_FILE)
 
 
 def test_copy_saves_credentials_as_expected(
@@ -133,8 +132,14 @@ def test_aws_export_prints_creds_as_expected(
     runner.invoke(app('test')._app, command_input_id)
     actual = runner.invoke(app('test')._app, command_input_aws_export)
 
-    expected = "\nalias awsb='aws --endpoint-url https://s3-oslo.arkivverket.no'\nexport AWS_REGION=oslo\nexport AWS_ACCESS_KEY_ID=ik\nexport AWS_SECRET_ACCESS_KEY=is\n\n"
+    # expected = "\nalias awsb='aws --endpoint-url https://s3-oslo.arkivverket.no'\nexport AWS_REGION=oslo\nexport AWS_ACCESS_KEY_ID=ik\nexport AWS_SECRET_ACCESS_KEY=is\n\n"
+    expected = """
+alias awsb='aws --endpoint-url https://s3-oslo.arkivverket.no'
+export AWS_REGION=oslo
+export AWS_ACCESS_KEY_ID=ik
+export AWS_SECRET_ACCESS_KEY=is
 
+"""
     assert actual.output == expected
 
 

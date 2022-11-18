@@ -4,6 +4,7 @@ from typing import Any
 
 from attrs import define
 from enterprython import component, setting
+from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from httpx import Response
 from rich.console import Console
 from rich.table import Table
@@ -43,7 +44,7 @@ class SessionCmd(Cmd):
         email: str = Argument(..., help="Email address where to send progress notification"),
         empty: bool = Option(True, help="If true check out empty bucket"),
         debug: bool = Option(False, help="Print complete response to console"),
-        endpoint: str = Option('', help="The endpoint to use for the API. Default is bevaring.digitalarkivet.no"),
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
     ) -> None:
         """Checks out given dataset into by default empty bucket. Response will be persisted for later use."""
         response = self.request_checkout(datasett_id, email, empty)
@@ -69,7 +70,7 @@ class SessionCmd(Cmd):
                 'client_name': BEVARING_CLI_APP_NAME,
                 'datasett_id': datasett_id,
                 'with_data': not empty,
-                'receipt_email': email
+                'receipt_email': email,
             }
         )
 
