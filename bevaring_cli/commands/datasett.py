@@ -90,6 +90,7 @@ class DatasettCmd(Cmd):
             copies = load(COPY_FILE)
         else:
             copies = {}
+
         existing_ids = list(copies.keys())
         copies[self.next_id(id, existing_ids)] = {
             'target_s3_uri': json['target_s3_uri'],
