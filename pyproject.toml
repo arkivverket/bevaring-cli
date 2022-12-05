@@ -1,10 +1,12 @@
 [tool.poetry]
 name = "bevaring-cli"
-version = "0.1.0"
+version = "0.2.0"
 description = "CLI tool to work with bevaring"
 readme = "README.md"
 authors = [
   "Ole-Martin Bratteng <olebra@arkivverket.no>",
+  "Eivind Rydningen <eivryd@arkivverket.no>",
+  "Pawel Matras <pawmat@arkivverket.no>"
 ]
 
 [tool.poetry.scripts]
