@@ -32,7 +32,7 @@ def login_result():
             "rh": "0.AR8AbtU0Q0pNw1D4VeYN6TMic40lu2tzCJrMvHVukrU9BvJUfAH.",
             "sub": "AAAAAAAAAAAAAAAAAAAAAIkzqFVrSaSaFHy782bbtaQ",
             "uti": "fqiBqXLPj0eQa82S-IYFAA",
-            "ver": "2.0"
+            "ver": "2.0",
         }
     }
 
@@ -42,5 +42,119 @@ def refresh_result():
     return {
         "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Imk2bEdrM0ZaenhSY1ViMkMzbkVRN3N5SEpsWSJ9.eyJhdWQiOiI2ZTc0MTcyYi1iZTU2LTQ4NDMtOWZmNC1lNjZhMzliYjEyZTMiLCJpc3MiOiJodHRwczovL2xvZ2luLm1pY3Jvc29mdG9ubGluZS5jb20vNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3L3YyLjAiLCJpYXQiOjE1MzcyMzEwNDgsIm5iZiI6MTUzNzIzMTA0OCwiZXhwIjoxNTM3MjM0OTQ4LCJhaW8iOiJBWFFBaS84SUFBQUF0QWFaTG8zQ2hNaWY2S09udHRSQjdlQnE0L0RjY1F6amNKR3hQWXkvQzNqRGFOR3hYZDZ3TklJVkdSZ2hOUm53SjFsT2NBbk5aY2p2a295ckZ4Q3R0djMzMTQwUmlvT0ZKNGJDQ0dWdW9DYWcxdU9UVDIyMjIyZ0h3TFBZUS91Zjc5UVgrMEtJaWpkcm1wNjlSY3R6bVE9PSIsImF6cCI6IjZlNzQxNzJiLWJlNTYtNDg0My05ZmY0LWU2NmEzOWJiMTJlMyIsImF6cGFjciI6IjAiLCJuYW1lIjoiQWJlIExpbmNvbG4iLCJvaWQiOiI2OTAyMjJiZS1mZjFhLTRkNTYtYWJkMS03ZTRmN2QzOGU0NzQiLCJwcmVmZXJyZWRfdXNlcm5hbWUiOiJhYmVsaUBtaWNyb3NvZnQuY29tIiwicmgiOiJJIiwic2NwIjoiYWNjZXNzX2FzX3VzZXIiLCJzdWIiOiJIS1pwZmFIeVdhZGVPb3VZbGl0anJJLUtmZlRtMjIyWDVyclYzeERxZktRIiwidGlkIjoiNzJmOTg4YmYtODZmMS00MWFmLTkxYWItMmQ3Y2QwMTFkYjQ3IiwidXRpIjoiZnFpQnFYTFBqMGVRYTgyUy1JWUZBQSIsInZlciI6IjIuMCJ9.pj4N-w_3Us9DrBLfpCt",  # noqa: E501
         "token_type": "Bearer",
-        "expires_in": 3899
+        "expires_in": 3899,
     }
+
+
+@pytest.fixture
+def copy_response():
+    return {
+        'datasett_id': 'di',
+        'session_id': 'si',
+        'bucket_name': 'bn',
+        'iam_access_key_id': 'ik',
+        'iam_secret_access_key': 'is',
+        'target_s3_uri': 's3://bn/di/ip0',
+        's3_path': None,
+    }
+
+
+@pytest.fixture
+def copy_response_with_s3_path():
+    return {
+        'datasett_id': 'di',
+        'session_id': 'si',
+        'bucket_name': 'bn',
+        'iam_access_key_id': 'ik',
+        'iam_secret_access_key': 'is',
+        'target_s3_uri': 's3://bn/sp/di/ip0',
+        's3_path': 'sp',
+    }
+
+
+@pytest.fixture
+def expected_creds():
+    return {
+        'target_s3_uri': 's3://bn/di/ip0',
+        'iam_access_key_id': 'ik',
+        'iam_secret_access_key': 'is',
+    }
+
+
+@pytest.fixture
+def expected_creds_with_s3_path():
+    return {
+        'target_s3_uri': 's3://bn/sp/di/ip0',
+        'iam_access_key_id': 'ik',
+        'iam_secret_access_key': 'is',
+    }
+
+
+@pytest.fixture
+def command_input():
+    return [
+        "datasett",
+        "copy",
+        "123",
+    ]
+
+
+@pytest.fixture
+def command_input_id():
+    return [
+        "datasett",
+        "copy",
+        "123",
+        "--id=test1",
+    ]
+
+
+@pytest.fixture
+def command_input_id_with_s3_path():
+    return [
+        "datasett",
+        "copy",
+        "123",
+        "--id=test2",
+        "--bucket-name=bn",
+        "--iam-access-key-id=ik",
+        "--iam-secret-access-key=is",
+        "--s3-path=sp",
+        "--generation-name=gn",
+        "--receipt-email=test@test",
+    ]
+
+
+@pytest.fixture
+def command_input_index_increment_test():
+    return [
+        "datasett",
+        "copy",
+        "123",
+    ]
+
+
+@pytest.fixture
+def command_input_print_copies_file():
+    return [
+        "datasett",
+        "copies",
+    ]
+
+
+@pytest.fixture
+def command_input_aws_export():
+    return [
+        "datasett",
+        "aws",
+        "test1"
+    ]
+
+
+@pytest.fixture
+def command_input_aws_export_id_not_found():
+    return [
+        "datasett",
+        "aws",
+        "wrongid",
+    ]

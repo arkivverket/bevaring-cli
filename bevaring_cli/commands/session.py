@@ -4,6 +4,7 @@ from typing import Any
 
 from attrs import define
 from enterprython import component, setting
+from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from httpx import Response
 from rich.console import Console
 from rich.table import Table
@@ -35,15 +36,15 @@ class SessionCmd(Cmd):
     def __attrs_post_init__(self):
         super().__init__()
         self.register(self.checkout, self.aws)
-        self._main.add(self._app, name='session', help="Manages process of new generation creation.")
+        self._main.add(self._app, name='session', help="Manages process of new generation creation"),
 
     def checkout(
         self,
-        datasett_id: str = Argument(..., help="Identifier of the dataset to check out."),
-        email: str = Argument(..., help="Email address where to send progress notification."),
+        datasett_id: str = Argument(..., help="Identifier of the dataset to check out"),
+        email: str = Argument(..., help="Email address where to send progress notification"),
         empty: bool = Option(True, help="If true check out empty bucket"),
         debug: bool = Option(False, help="Print complete response to console"),
-        endpoint: str = Option('', help="The endpoint to use for the API")
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
     ) -> None:
         """Checks out given dataset into by default empty bucket. Response will be persisted for later use."""
         response = self.request_checkout(datasett_id, email, empty)
@@ -69,7 +70,7 @@ class SessionCmd(Cmd):
                 'client_name': BEVARING_CLI_APP_NAME,
                 'datasett_id': datasett_id,
                 'with_data': not empty,
-                'receipt_email': email
+                'receipt_email': email,
             }
         )
 
