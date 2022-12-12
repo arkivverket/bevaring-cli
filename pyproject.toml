@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bevaring-cli"
-version = "0.2.0"
+version = "0.3.0"
 description = "CLI tool to work with bevaring"
 readme = "README.md"
 authors = [
