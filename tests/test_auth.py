@@ -25,7 +25,7 @@ def test_auth():
 
     assert auth._msal_app_kwargs["authority"] == "https://login.microsoftonline.com/organizations"
     assert auth._msal_app_kwargs["app_name"] == "bevaring-cli"
-    assert auth._msal_app_kwargs["app_version"] == "0.1.0"
+    assert auth._msal_app_kwargs["app_version"] == "0.3.0"
 
 
 def test_none_result():

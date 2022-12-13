@@ -39,6 +39,7 @@ class DatasettCmd(Cmd):
         limit: int = Option(2, help="Max amount of datasetts to list"),
         endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
     ) -> None:
+        """Prints out the list of datasetts."""
         response = self._bevaring().get(f'metadata/datasett?limit={limit}')
 
         table = Table("Datasett ID", "Databehandler", "Merkelapp")
@@ -108,6 +109,7 @@ class DatasettCmd(Cmd):
         self,
         id: str = Argument(..., help="Id of the aws credentials to print"),
     ) -> None:
+        """Prints out the locally stored credentials generated from a specific copy operation."""
         try:
             copy = load(COPY_FILE)[id]
             aws_export(copy['iam_access_key_id'], copy['iam_secret_access_key'])
