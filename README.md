@@ -16,7 +16,7 @@ CLI tool to work with bevaring.
 Before installing `bevaring-cli`, make sure you have the [prerequisites](#project-prerequisites) installed.
 
 ```shell
-pipx install https://github.com/arkivverket/bevaring-cli/releases/download/0.1.0/bevaring_cli-0.1.0-py3-none-any.whl
+pipx install https://github.com/arkivverket/bevaring-cli/releases/download/0.3.0/bevaring_cli-0.3.0-py3-none-any.whl
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ Install dependencies first:
 poetry install
 ```
 
-Enter the poetry environment (`poetry shell`), are pre-prend all commands with `poetry run`.
+Enter the poetry environment (`poetry shell`), and prepend all commands with `poetry run`.
 
 ```shell
 python -m bevaring_cli.main [OPTIONS] COMMAND [ARGS]...
@@ -40,11 +40,11 @@ python -m bevaring_cli.main [OPTIONS] COMMAND [ARGS]...
 
 ```shell
 python -m bevaring_cli.main login
-python -m bevaring_cli.main --endpoint bevaring.test.digitalarkivet.no login
+python -m bevaring_cli.main --endpoint=bevaring.test.digitalarkivet.no login
 ```
 
 ### Building wheel
 
 ```shell
-poetry build --format wheel
+poetry build --format=wheel
 ```
