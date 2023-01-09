@@ -21,7 +21,7 @@ def test_auth():
 
     assert auth._msal_app_instance is None
     assert auth.authority == "https://login.microsoftonline.com/organizations"
-    assert auth.scopes == ["https://bevaring.digitalarkivet.no/User.Login"]
+    assert auth.scopes == ["https://bevaring.dev.digitalarkivet.no/User.Login"]
 
     assert auth._msal_app_kwargs["authority"] == "https://login.microsoftonline.com/organizations"
     assert auth._msal_app_kwargs["app_name"] == "bevaring-cli"
