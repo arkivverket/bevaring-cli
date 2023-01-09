@@ -66,7 +66,7 @@ class DatasettCmd(Cmd):
         iam_access_key_id: str = Option(None, help="IAM access key id if user has a bucket"),
         iam_secret_access_key: str = Option(None, help="IAM secret access key if user has a bucket"),
         s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied"),
-        generation_name: str = Option(None, help="Which generation to copy"),
+        generation_name: str = Option('ip0', help="Which generation to copy"),
         receipt_email: str = Option(None, help="Email address for progress notifications"),
         endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
     ) -> None:
