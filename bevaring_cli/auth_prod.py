@@ -4,6 +4,7 @@ from sys import stdout
 import msal
 from attrs import define
 from enterprython import component, setting
+from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from msal_extensions import FilePersistence, PersistedTokenCache
 
 from bevaring_cli import (
@@ -49,7 +50,7 @@ class AuthenticationProd(Authentication):
         """
         Returns the MSAL application object
         """
-        if DEFAULTS[ENDPOINT.lower()] != self.endpoint and stdout.isatty():
+        if ENTERPRYTHON_VALUE_STORE['ENDPOINT'] != self.endpoint and stdout.isatty():
             logger.warning("Setting endpoint to [green]%s[/green]", self.endpoint)
         if not self._msal_app_instance:
             self._msal_app_instance = msal.PublicClientApplication(client_id=CLIENT_ID, **self._msal_app_kwargs)
