@@ -1,5 +1,4 @@
 import logging
-from sys import stdout
 
 import msal
 from attrs import define
@@ -11,10 +10,9 @@ from bevaring_cli import (
     __version__,
 )
 from bevaring_cli.auth import Authentication
-from bevaring_cli.config import CONFIG_DIR, DEFAULTS
+from bevaring_cli.config import CONFIG_DIR, ENDPOINT
 from bevaring_cli.exceptions import AuthenticationError
 
-ENDPOINT = 'ENDPOINT'
 CLIENT_ID = 'd18685f9-148d-4e9a-98b3-194bcd01bc95'
 
 logger = logging.getLogger(__name__)
@@ -49,8 +47,6 @@ class AuthenticationProd(Authentication):
         """
         Returns the MSAL application object
         """
-        if DEFAULTS[ENDPOINT.lower()] != self.endpoint and stdout.isatty():
-            logger.warning("Setting endpoint to [green]%s[/green]", self.endpoint)
         if not self._msal_app_instance:
             self._msal_app_instance = msal.PublicClientApplication(client_id=CLIENT_ID, **self._msal_app_kwargs)
 

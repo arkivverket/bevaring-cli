@@ -4,7 +4,6 @@ from genericpath import isfile
 from typing import List
 from attrs import define
 from enterprython import component
-from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from rich.console import Console
 from rich.table import Table
 from typer import Argument, Option
@@ -14,7 +13,7 @@ from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.bevaring_client import BevaringClient
 from bevaring_cli.commands.app import App
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import COPY_FILE
+from bevaring_cli.config import COPY_FILE, DEFAULTS, ENDPOINT
 from bevaring_cli.exceptions import ensure_success
 from bevaring_cli.commands.session import SessionCmd
 aws_export = SessionCmd.aws_export
@@ -37,7 +36,7 @@ class DatasettCmd(Cmd):
     def list(
         self,
         limit: int = Option(2, help="Max amount of datasetts to list"),
-        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {DEFAULTS[ENDPOINT]}"),
     ) -> None:
         """Prints out the list of datasetts."""
         response = self._bevaring().get(f'metadata/datasett?limit={limit}')
@@ -68,7 +67,7 @@ class DatasettCmd(Cmd):
         s3_path: str = Option(None, help="Root-folder within bucket where the datasett should be copied"),
         generation_name: str = Option('ip0', help="Which generation to copy"),
         receipt_email: str = Option(None, help="Email address for progress notifications"),
-        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {DEFAULTS[ENDPOINT]}"),
     ) -> None:
         """Initiates copying of a chosen generation of a datasett into a target bucket. If the user has no bucket, a temporary bucket with credentials is created."""
         response = self._bevaring().post(

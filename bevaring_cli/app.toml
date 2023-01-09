@@ -1,5 +1,5 @@
 
-endpoint = 'bevaring.digitalarkivet.no'
+endpoint = 'bevaring.dev.digitalarkivet.no'
 
 # Only defaults here. Will be overwritten in session.toml
 datasett_id = ''
