@@ -8,7 +8,7 @@ bevaring [OPTIONS] COMMAND [ARGS]...
 
 **Options**:
 
-* `--endpoint=TEXT`: The endpoint to use for the API [default: bevaring.dev.digitalarkivet.no]
+* `--endpoint=TEXT`: The endpoint to use for the API [default: bevaring.digitalarkivet.no]
 * `--install-completion`: Install completion for the current shell.
 * `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
 * `--help`: Show this message and exit.
@@ -118,7 +118,7 @@ bevaring datasett list [OPTIONS]
 **Options**:
 
 * `--limit=INTEGER`: Max amount of datasetts to list
-* `--endpoint=TEXT`: The endpoint to use for the API [default: bevaring.dev.digitalarkivet.no]
+* `--endpoint=TEXT`: The endpoint to use for the API [default: bevaring.digitalarkivet.no]
 * `--help`: Show this message and exit.
 
 ### `bevaring datasett copies`
@@ -158,7 +158,7 @@ bevaring datasett copy [ARGS] [OPTIONS]
 * `--s3-path=TEXT`: Root-folder within bucket where the datasett should be copied
 * `--generation-name=TEXT`: Which generation to copy
 * `--receipt-email=TEXT`: Email address for progress notifications
-* `--endpoint=TEXT`: The endpoint to use for the API [default: bevaring.dev.digitalarkivet.no]
+* `--endpoint=TEXT`: The endpoint to use for the API [default: bevaring.digitalarkivet.no]
 * `--help`: Show this message and exit.
 
 ### `bevaring datasett aws`
