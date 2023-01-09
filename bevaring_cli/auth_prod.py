@@ -1,5 +1,4 @@
 import logging
-from sys import stdout
 
 import msal
 from attrs import define
