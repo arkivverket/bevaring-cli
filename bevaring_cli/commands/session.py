@@ -4,7 +4,6 @@ from typing import Any
 
 from attrs import define
 from enterprython import component, setting
-from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from httpx import Response
 from rich.console import Console
 from rich.table import Table
@@ -15,7 +14,7 @@ from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.bevaring_client import BevaringClient
 from bevaring_cli.commands.app import App
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import SESSION_FILE
+from bevaring_cli.config import DEFAULTS, ENDPOINT, SESSION_FILE
 from bevaring_cli.exceptions import ensure_success
 
 logger = logging.getLogger(__name__)
@@ -44,7 +43,7 @@ class SessionCmd(Cmd):
         email: str = Argument(..., help="Email address where to send progress notification"),
         empty: bool = Option(True, help="If true check out empty bucket"),
         debug: bool = Option(False, help="Print complete response to console"),
-        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {ENTERPRYTHON_VALUE_STORE['ENDPOINT']}"),
+        endpoint: str = Option('', help=f"The endpoint to use for the API. Default is {DEFAULTS[ENDPOINT]}"),
     ) -> None:
         """Checks out given dataset into by default empty bucket. Response will be persisted for later use."""
         response = self.request_checkout(datasett_id, email, empty)

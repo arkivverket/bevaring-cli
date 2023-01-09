@@ -5,6 +5,7 @@ from enterprython import component, setting
 from httpx import Client
 
 from bevaring_cli.auth import Authentication
+from bevaring_cli.config import ENDPOINT
 
 
 @component()
@@ -12,7 +13,7 @@ from bevaring_cli.auth import Authentication
 class BevaringClient:
     """Lazily initialized Bevaring rest API client. Contains authorization headers."""
     auth: Authentication
-    endpoint: str = setting('ENDPOINT')
+    endpoint: str = setting(ENDPOINT)
 
     @cache
     def __call__(self) -> Client:

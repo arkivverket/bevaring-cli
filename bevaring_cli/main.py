@@ -3,20 +3,21 @@ import re
 from importlib import import_module
 from logging.handlers import RotatingFileHandler
 from os.path import isfile, dirname, join
+from sys import stdout
 from typing import List
 
 from toml import load
 
 from bevaring_cli.commands.app import App
 from enterprython import assemble, load_config
+from enterprython._inject import ENTERPRYTHON_VALUE_STORE
 from rich.logging import RichHandler
 
 from bevaring_cli import BEVARING_CLI_APP_NAME
 from bevaring_cli.commands.cmd import Cmd
-from bevaring_cli.config import SESSION_FILE, CONFIG_DIR, DEFAULTS
+from bevaring_cli.config import ENDPOINT, SESSION_FILE, CONFIG_DIR, DEFAULTS
 
 from glob import glob
-
 
 console_handler = RichHandler(markup=True, show_path=False, show_time=False, show_level=False)
 console_handler.setFormatter(logging.Formatter("%(message)s", style='%'))
@@ -24,6 +25,8 @@ file_handler = RotatingFileHandler(CONFIG_DIR + '/' + BEVARING_CLI_APP_NAME + '.
 file_handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s: %(message)s"))
 logging.basicConfig(level=logging.INFO, handlers=[console_handler, file_handler])  # Enable DEBUG log for entire script
 logging.getLogger("msal").setLevel(logging.WARNING)  # Optionally disable MSAL DEBUG logs
+
+logger = logging.getLogger(__name__)
 
 
 def all_cmds(cmds: List[Cmd]) -> Cmd:
@@ -46,12 +49,14 @@ def app(profile='prod') -> Cmd:
     if isfile(SESSION_FILE):
         paths.append(SESSION_FILE)
     load_config(app_name=BEVARING_CLI_APP_NAME.replace('-', '_'), paths=paths)
+    for path in paths:
+        for key, value in load(path).items():
+            DEFAULTS[key.upper()] = value
+    if stdout.isatty() and DEFAULTS[ENDPOINT] != ENTERPRYTHON_VALUE_STORE[ENDPOINT]:
+        logger.warning("Setting endpoint to [green]%s[/green]", ENTERPRYTHON_VALUE_STORE[ENDPOINT])
     # TODO: Enterprython does not forward profile down component stack. So we have to simulate it here by importing
     # TODO: packages when necessary. Fix the bug in Enterprython.
     import_components(lambda file: not file.endswith('_prod') or profile == 'prod')
-    for path in paths:
-        for key, value in load(path).items():
-            DEFAULTS[key] = value
     return assemble(all_cmds)
 
 
@@ -65,7 +70,6 @@ def main():
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception as e:
-        logger = logging.getLogger(__name__)
         logger.error(f"Command failed!\n{str(e)}")
         raise SystemExit(getattr(e, 'exit_code', 2))
 
